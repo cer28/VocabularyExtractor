@@ -47,17 +47,17 @@ class SegmenterHelper:
         """
 
         config = self.config
-        if config.charset:
-            charset = config.charset
-        else:
-            charset = 'simplified'
+        # if config.charset:
+        #     charset = config.charset
+        # else:
+        #     charset = 'simplified'
 
         self.dicts = []
 
         for dictname in config.dictionaries:
             self.add_message("Loading dictionary %s ..." % dictname)
             dictFile = os.path.join(config.appDir, 'dict', dictname)
-            dict = segmenter.Dictionary(dictFile, format='cedict', verbose=True, updatefunction=updatefunction)
+            dict = segmenter.Dictionary(dictFile, format='edict', verbose=True, updatefunction=updatefunction)
 
             if dict.messages != None:
                 for elem in dict.messages:
@@ -67,7 +67,7 @@ class SegmenterHelper:
             self.add_message(f"Loaded dictionary {dictname}, {dict.getWordCount()} words")
             self.dicts.append(dict)
 
-        self.seg = segmenter.Segmenter(charset, self.dicts, self.stats)
+        self.seg = segmenter.Segmenter(config.charset, self.dicts, self.stats)
         self.add_message("")
 
     def load_known_words(self, updatefunction=None):

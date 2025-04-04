@@ -8,19 +8,12 @@ import errno
 
 class Config(dict):
 
-    configFileFullPath = None
-    appDir = None
-
-    dirtyDicts = False
-    dirtyFilters = False
-    dirtyExtraCols = False
-
     def __init__(self, configFileFullPath):
-        self.filters = list(),
-        self.extracolumns = list(),
+        self.filters = list()
+        self.extracolumns = list()
         self.currentdir = "samples"
-        self.dictionaries = ['vnedict.txt.u8'],
-        self.charset = 'simplified'
+        self.dictionaries = ['vnedict.txt.u8']
+        self.charset = 'Vietnamese'
 
         # TODO platform-independent
         #self.configFileFullPath = os.path.join(self.configPath, self.configFileName)
@@ -29,6 +22,17 @@ class Config(dict):
 #        self.makeWorkingDir()
         self.load()
 
+    def __setattr__(self, key, value):
+        """
+        This is so that json.load set the attributes not string keys of the dict
+        """
+        self[key] = value
+
+    def __getattr__(self, key):
+        try:
+            return self[key]
+        except KeyError:
+            raise AttributeError(f"'Config' object has no attribute '{key}'")
 
     def setDefaults(self):
         fields = {
@@ -37,16 +41,20 @@ class Config(dict):
             'extracolumns': [],
             'currentdir': "samples",
             'dictionaries': ['vnedict.txt.u8'],
-            'charset': 'simplified',
+            'charset': 'English',
+            'dirtyDicts': False,
+            'dirtyFilters': False,
+            'dirtyExtraCols': False,
             }
 
         for (k, v) in fields.items():
-            self.__dict__[k] = v
-            # if not self.has_key(k):
-            #     self[k] = v
+            try:
+                if self[k] is None:
+                    self[k] = v
+            except KeyError:
+                self[k] = v
 
-
-#    def makeWorkingDir(self):
+    #    def makeWorkingDir(self):
 #        base = self.configPath
 #        for x in (base,
 #                  os.path.join(base, "plugins"),
@@ -76,7 +84,7 @@ class Config(dict):
             from tempfile import mkstemp
             (fd, tmpname) = mkstemp(dir=configDir)
             tmpfile = os.fdopen(fd, 'w')
-            json.dump(dict(self), tmpfile)
+            json.dump(self.__dict__, tmpfile)
             tmpfile.close()
             # the write was successful, delete config file (if exists) and rename
             if os.path.isfile(self.configFileFullPath):

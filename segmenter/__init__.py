@@ -8,6 +8,7 @@ import os
 
 from segmenter import charset
 from segmenter.plugins import SegmentMethodPlugin
+from segmenter.charset import charsets
 
 print(SegmentMethodPlugin.__subclasses__())
 
@@ -17,13 +18,32 @@ except NameError:
     WindowsError = OSError
 
 
+class CJK:
+    # http://en.wikipedia.org/wiki/CJK_Unified_Ideographs
+    cjkUnifiedIdeographs = u'\u4E00-\u9FFF'
+    cjkUnifiedIdeographsExtA = u'\u3400-\u4DBF'
+    # cjkUnifiedIdeographsExtB = u'\u20000-2A6DF'
+    # cjkEnclosedLettersAndMonths = u'\u3200-\u32FF'
+    cjkCompatibilityIdeographs = u'\uF900-\uFAFF'
+
+    # Non-CJK characters used in simplified/traditional field
+    # Some of these are covered in Halfwidth and Fullwidth Forms. But this makes a stricter filter
+    cjkMiddleDot = u'\u00B7'
+    cjkFullwidthComma = u'\uFF0C'
+    cjkLingZero = u'\u3007'
+    cjkFullwidthLatin = u'\uFF21-\uFF3A\uFF41-\uFF5A'
+    cjkKatakanaMiddleDot = u'\u30FB'
+
+    # Bopomofo and zhuyin
+    cjkBopomofo = u'\u3105-\u312D\u31A0-\u31A5\u02EA\u02EB\u02CA\u02C7\u02CB\u02D9'
+
 
 class DictionaryWord:
     '''
     A single word of a dictionary, with expression, reading, and meaning
     '''
 
-    def __init__(self, entry, english):
+    def __init__(self, entry, english, pinyin=None):
         self.entry = entry
         self.english = english
     
@@ -44,7 +64,57 @@ class Dictionary:
     def getWordCount(self):
         return len(self.words)
 
-    def read_vndict_line(self, line, lineno):
+    def read_cedict_line(self, line, lineno):
+        if re.match('\\s*#', line):
+            # A comment line
+            return None
+
+        cjkRange = u'%s%s%s%s%s%s%s%s' % (
+        CJK.cjkKatakanaMiddleDot, CJK.cjkFullwidthComma, CJK.cjkLingZero, CJK.cjkUnifiedIdeographsExtA,
+        CJK.cjkUnifiedIdeographs, CJK.cjkCompatibilityIdeographs, CJK.cjkFullwidthLatin, CJK.cjkBopomofo)
+
+        # Allow semicolons in pinyin, because the chardict has them that way
+        # pat = u'([%s]+)[ \t]([%s]+)[ \t]\[([a-zA-Z0-9,\xb7: ]+)\][ \t]/(.*)/\s*$' % (cjkRange, cjkRange)
+        pat = u'([%s]+)[ \t]([%s]+)[ \t]\[([a-zA-Z0-9,\xb7:; ]+)\][ \t]/(.*)/\s*$' % (cjkRange, cjkRange)
+
+        m = re.match(pat, line)
+        if m:
+            return DictionaryWord((m.group(1), m.group(2)), m.group(3), m.group(4))
+        else:
+            if self.verbose:
+                self.messages.append(f"Warning: Invalid CEDICT entry in line {lineno} of {self.filename}: '{line}'")
+
+            return None
+
+    def read_cedict_file(self, filename, updatefunction):
+        '''
+        The CEDICT format is traditional simplified [pinyin] english
+        throws: IOError
+        '''
+        progresspct = 0
+        try:
+            filebytes = os.path.getsize(filename)
+            fh = open(filename)  # throws IOError
+        except (WindowsError, OSError, IOError) as e:
+            self.messages.append("Warning: Failed to load dictionary %s: %s" % (filename, e.message))
+            return
+        try:
+            lineno = 0
+            for line in fh.read().splitlines():
+                lineno += 1
+                # This doesn't exactly equal 100% due to unicode vs. byte comparisons
+                progresspct += len(line)*100.0/filebytes
+                if updatefunction and progresspct > 0:
+                    updatefunction(progresspct)
+
+                word = self.read_cedict_line(line, lineno)
+                if word is not None:
+                    self.words.append(word)
+        finally:
+            fh.close()
+
+
+    def read_edict_line(self, line, lineno):
         if re.match('\\s*#', line):
             # A comment line
             return None
@@ -66,7 +136,7 @@ class Dictionary:
                 
             return None
 
-    def read_vnedict_file(self, filename, updatefunction):
+    def read_edict_file(self, filename, updatefunction):
         '''
         The CEDICT format is traditional simplified [pinyin] english
         throws: IOError
@@ -88,7 +158,7 @@ class Dictionary:
                     updatefunction(progresspct)
 
                 #if lineno > 100: break  #TODO temp debugging delete
-                word = self.read_vndict_line(line, lineno)
+                word = self.read_edict_line(line, lineno)
                 if word != None:
                     self.words.append(word)
         finally:
@@ -114,8 +184,8 @@ class Dictionary:
         self.tag = tag
         self.verbose = verbose
 
-        if (format == 'cedict'):
-            self.read_vnedict_file(filename, updatefunction)
+        if (format == 'edict'):
+            self.read_edict_file(filename, updatefunction)
         else :
             self.messages.append("Unknown dictionary format '%s'" % format)
             raise Exception("Unknown dictionary format '%s'" % format)
@@ -160,8 +230,7 @@ class Statistics:
         try:
             curline = 0
             for line in fh.read().splitlines():
-                curline +=1
-                line = unicode(line, "utf-8")
+                curline += 1
                 if formatType == 'tab':
                     m = re.match('^# Heading: ', line)
                     if m:
@@ -291,7 +360,6 @@ class Segmenter:
     and return the result set to the caller
     '''
 
-    characterSets = ('simplified', 'traditional', 'combined')  ## NOTE not yet sure if combined logically will work
     #TODO refactor segmentationMethods into plugin arch
     segmentationMethods = ('simpleLongestMatch', 'longestMatchPlusTransliterations', 'longestMatchPlusTranslitPlusChNames')
     tokenMatchTypes = ('cjk', 'cjk_plus_az')
@@ -366,18 +434,18 @@ class Segmenter:
         def isSectionBreak(self):
             return True
 
-    def __init__(self, character, dictArray, statDict, method='simpleLongestMatch', tokenMatchType='cjk', dictionaryOperationType='replace', verbose=False):
+    def __init__(self, charset, dictArray, statDict, method='simpleLongestMatch', tokenMatchType='cjk', dictionaryOperationType='replace', verbose=False):
         '''
         Constructor
         Note that the Segmenter knows whether to allow just CJK or CJK + A-Z,
         but the dictionary has it's own separate regexp for what is a valid character string.
         '''
-        if not character in self.characterSets:
-            raise Exception("Unknown character type '%s'" % character)
+        if charset not in charsets.keys():
+            raise Exception("Unknown character type '%s'" % charset)
         else:
-            self.character = character
+            self.charset = charset
 
-        if not method in self.segmentationMethods:    # why does this say formatTypes is not defined
+        if method not in self.segmentationMethods:    # why does this say formatTypes is not defined
             raise Exception("Unknown segmentation method %s" % method)
         else:
             self.segmentationMethod = method
@@ -416,7 +484,7 @@ class Segmenter:
         
         # if some wiseacre tries to define the section break, override it
         
-        self.words[self.sectionBreakChar] = self.SectionBreakWord(self.sectionBreakChar, self.character) 
+        self.words[self.sectionBreakChar] = self.SectionBreakWord(self.sectionBreakChar, self.charset)
 
     def _buildStatistics(self):
         #TODO verify character set matches
@@ -431,7 +499,7 @@ class Segmenter:
     def getWord(self, key, autoCreate=False):
         if key not in self.words:
             if autoCreate:
-                self.words[key] = self.Word(key, self.character)
+                self.words[key] = self.Word(key, self.charset)
             else:
                 return None
 
