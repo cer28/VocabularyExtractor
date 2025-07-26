@@ -200,7 +200,7 @@ class Statistics:
     '''
     For the storage of a list of words and an associated value
     '''
-    characterSets = ('simplified', 'traditional', 'combined')
+    characterSets = ('simplified', 'traditional', 'combined', 'Vietnamese')
 #    statisticsTypes = ('hsk_level', 'frequency_per_million', 'is_chengyu')
     formatTypes = ('tab')
 
@@ -227,7 +227,7 @@ class Statistics:
         self.filename = filename
 
         self.words = []
-        fh = open(self.filename)  #throws IOError
+        fh = open(self.filename, encoding='utf-8')  #throws IOError
         try:
             curline = 0
             for line in fh.read().splitlines():
@@ -426,7 +426,7 @@ class Segmenter:
     
         def getDefinition(self):
             #TODO make sure we're adding for the right charSet
-            return self.definition.__str__()   # using str(self.definition) just gives: UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-1
+            return self.definition.english   # Return only the English meaning, not the full entry\tmeaning format
 
         def __str__(self):
             return 'Word:\n\tkey=%s,\n\tcharacter=%s\n\tstatistics={%s}, definitions=[%s]' % (self.key, self.character, self.stats, self.definitions)

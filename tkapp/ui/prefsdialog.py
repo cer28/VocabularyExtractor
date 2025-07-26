@@ -39,7 +39,7 @@ class PrefsDialog(tkinter.Toplevel):
 
         # self.m_staticText3 = tkinter.Label(self.dict_panel, text="Dictionaries")
 
-        dict_listbox = Listbox(dict_panel, height=4, selectmode='multiple')
+        dict_listbox = Listbox(dict_panel, height=4, selectmode='multiple', name='dict_listbox', exportselection=False)
         dict_options: list = self.get_file_items(os.path.join(self.config.appDir, 'dict'))
         for item in dict_options:
             dict_listbox.insert(dict_options.index(item), item)
@@ -57,7 +57,7 @@ class PrefsDialog(tkinter.Toplevel):
 
         # self.m_staticText3 = tkinter.Label(self.filter_panel, text="Dictionaries")
 
-        filters_listbox = Listbox(filter_panel, height=4, selectmode='multiple')
+        filters_listbox = Listbox(filter_panel, height=4, selectmode='multiple', name='filters_listbox', exportselection=False)
         filters_listbox.pack(padx=10, pady=10)
         filter_options: list = self.get_file_items(os.path.join(self.config.appDir, 'filter'))
         for item in filter_options:
@@ -72,10 +72,10 @@ class PrefsDialog(tkinter.Toplevel):
         extra_col_panel = tkinter.LabelFrame(main_frame, text="Extra Column(s)")
         extra_col_panel.pack()
 
-        extracol_listbox = Listbox(extra_col_panel, height=4, selectmode='multiple')
+        extracol_listbox = Listbox(extra_col_panel, height=4, selectmode='multiple', name='extracol_listbox', exportselection=False)
         extracol_listbox.pack()
 
-        extracol_options: list = self.get_file_items(os.path.join(self.config.appDir, 'data', current_charset))
+        extracol_options: list = self.get_file_items(os.path.join(self.config.appDir, 'data'))
         for item in extracol_options:
             extracol_listbox.insert(extracol_options.index(item), item)
 
@@ -93,7 +93,8 @@ class PrefsDialog(tkinter.Toplevel):
 
         for idx, val in enumerate(charsets):
             radio = Radiobutton(charset_panel,
-                                text=val, variable=self.selected_charset_svar, value=val)
+                                text=val, variable=self.selected_charset_svar, value=val,
+                                command=self.on_charset_change)
             radio.pack()
 
         button_frame = Frame(main_frame)
@@ -114,11 +115,19 @@ class PrefsDialog(tkinter.Toplevel):
         self.extracol_options = extracol_options
         self.extracol_listbox = extracol_listbox
 
-
+    def on_charset_change(self):
+        # Handle charset change without affecting other selections
+        pass
 
     def _RefreshExtraColumnListBox(self, charset):
-        extraColList = self.get_file_items(os.path.join(self.config.appDir, 'data', charset))
-        self.extracol_listbox.SetItems(extraColList)
+        extraColList = self.get_file_items(os.path.join(self.config.appDir, 'data'))
+        # Clear existing items
+        self.extracol_listbox.delete(0, 'end')
+        # Add new items
+        for item in extraColList:
+            self.extracol_listbox.insert('end', item)
+        # Update the options list
+        self.extracol_options = extraColList
 
     def OnOk(self):
         # Check for dictionary changes and set reload if necessary

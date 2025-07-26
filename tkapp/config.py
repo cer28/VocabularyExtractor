@@ -84,7 +84,10 @@ class Config(dict):
             from tempfile import mkstemp
             (fd, tmpname) = mkstemp(dir=configDir)
             tmpfile = os.fdopen(fd, 'w')
-            json.dump(self.__dict__, tmpfile)
+            # Save both instance attributes and dictionary data
+            save_data = dict(self)  # Get dictionary data
+            save_data.update(self.__dict__)  # Add instance attributes
+            json.dump(save_data, tmpfile)
             tmpfile.close()
             # the write was successful, delete config file (if exists) and rename
             if os.path.isfile(self.configFileFullPath):

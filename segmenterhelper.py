@@ -88,7 +88,7 @@ class SegmenterHelper:
     def load_filter_file(self, filename):
         import re
         try:
-            fh = open(filename)  # throws IOError
+            fh = open(filename, 'r', encoding='utf-8')  # throws IOError
         except Exception as ex:
             self.add_message(f"**Error: Failed to load filter file {filename}: ({ex})")
             return 0
@@ -107,14 +107,21 @@ class SegmenterHelper:
         return lineno
 
     def load_statistics_file(self, config, filename, charset):
-        fullpath = os.path.join(config.appDir, 'data', charset, filename)
+        fullpath = os.path.join(config.appDir, 'data', filename)
+        print(f"DEBUG: Attempting to load statistics file: {fullpath}")
+        print(f"DEBUG: charset={charset}, filename={filename}")
         try:
             # self.stats.append(segmenter.Statistics(fullpath, 'tab', keyword, charset))
             stat = segmenter.Statistics(fullpath, 'tab', charset)
             self.stats[filename] = stat
             self.statFiles[filename] = stat.statisticType
-            self.add_message(f"Loaded extra column data file {charset}/{filename}")
+            print(f"DEBUG: Successfully loaded {filename} into statFiles")
+            self.add_message(f"Loaded extra column data file {filename}")
         except IOError as e:
+            print(f"DEBUG: IOError loading {filename}: {e}")
+            self.add_message(f"**Failed to load data file {fullpath}: {e}")
+        except Exception as e:
+            print(f"DEBUG: Other exception loading {filename}: {e}")
             self.add_message(f"**Failed to load data file {fullpath}: {e}")
 
     def read_files(self, filelist):
@@ -166,11 +173,11 @@ class SegmenterHelper:
                 "Running total words",
                 "text",
                 "num. occur.",
-                "1st occur.",
-                "reading"
+                "1st occur."
             ] +
-            [self.statFiles[filename] for filename in self.config.extracolumns] +
+            [self.statFiles[filename] for filename in self.config.extracolumns if filename in self.statFiles] +
             [
+                "reading",
                 "meaning",
                 "sample sentence"
             ]) + "\n"
@@ -213,8 +220,9 @@ class SegmenterHelper:
                             str(len(lex.indexes)),
                             str(lex.indexes[0])
                         ] +
-                        [word.getStatistic(self.statFiles[y]) for y in self.config.extracolumns] +
+                        [word.getStatistic(self.statFiles[y]) for y in self.config.extracolumns if y in self.statFiles] +
                         [
+                            word.key,  # reading placeholder
                             word.getDefinition(),
                             results.findFirstSentence(lex)
                         ]
