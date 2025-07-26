@@ -151,12 +151,24 @@ class MainWindow(ttk.Frame):
     def OnRefreshResults(self):
         self.segHelper.set_text(self.notebook.editorPanel.GetValue())
 
-        progress_var = tk.IntVar()
-        progress_bar = ttk.Progressbar(self, variable=progress_var, maximum=100)
-        progress_bar.pack(pady=10)
+        # Create progress dialog
+        progress_dialog = tk.Toplevel(self.root_window)
+        progress_dialog.title("Analyzing Text")
+        progress_dialog.geometry("300x100")
+        progress_dialog.transient(self.root_window)
+        progress_dialog.grab_set()
 
-        self.segHelper.summarize_results(updatefunction=progress_var.set)
-        progress_bar.destroy()
+        tk.Label(progress_dialog, text="Analyzing text...").pack(pady=10)
+        progress_var = tk.IntVar()
+        progress_bar = ttk.Progressbar(progress_dialog, variable=progress_var, maximum=100)
+        progress_bar.pack(pady=10, padx=20, fill='x')
+
+        def update_progress(value):
+            progress_var.set(value)
+            progress_dialog.update_idletasks()
+
+        self.segHelper.summarize_results(updatefunction=update_progress)
+        progress_dialog.destroy()
 
         # st = wx.StaticText(self.notebook.resultPanel, -1, self.segHelper.summary, (10, 10))
         self.notebook.summaryPanel.SetValue(self.segHelper.summary)
@@ -215,13 +227,24 @@ class MainWindow(ttk.Frame):
         self.root_window.wait_window(d)
 
         if self.config.dirtyDicts:
-            progress_var = tk.IntVar()
-            # name="Loading Dictionary", ...
-            progress_bar = ttk.Progressbar(self, variable=progress_var, maximum=100)
-            progress_bar.pack(pady=10)
+            # Create progress dialog
+            progress_dialog = tk.Toplevel(self.root_window)
+            progress_dialog.title("Loading Dictionary")
+            progress_dialog.geometry("300x100")
+            progress_dialog.transient(self.root_window)
+            progress_dialog.grab_set()
 
-            self.segHelper.load_data(updatefunction=progress_var.set)
-            progress_bar.destroy()
+            tk.Label(progress_dialog, text="Loading dictionary...").pack(pady=10)
+            progress_var = tk.IntVar()
+            progress_bar = ttk.Progressbar(progress_dialog, variable=progress_var, maximum=100)
+            progress_bar.pack(pady=10, padx=20, fill='x')
+
+            def update_progress(value):
+                progress_var.set(value)
+                progress_dialog.update_idletasks()
+
+            self.segHelper.load_data(updatefunction=update_progress)
+            progress_dialog.destroy()
 
             # self.segHelper.LoadData(self.config, updatefunction=wx.ProgressDialog(title="Progress", message="Loading Dictionary", style=wx.PD_AUTO_HIDE|wx.PD_SMOOTH).Update)
             self.config.dirtyDicts = False

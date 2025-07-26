@@ -62,14 +62,26 @@ def run(segHelper):
     app = Tk()
     app.title("Vocabulary Extractor")
 
+    # Create initial loading dialog
+    loading_dialog = tk.Toplevel(app)
+    loading_dialog.title("Loading")
+    loading_dialog.geometry("300x100")
+    loading_dialog.transient(app)
+    loading_dialog.grab_set()
+    
+    tk.Label(loading_dialog, text="Loading dictionaries...").pack(pady=10)
     progress_var = tk.IntVar()
-    progress_bar = ttk.Progressbar(app, variable=progress_var, maximum=100)
-    progress_bar.pack(pady=10)
+    progress_bar = ttk.Progressbar(loading_dialog, variable=progress_var, maximum=100)
+    progress_bar.pack(pady=10, padx=20, fill='x')
+    
+    def update_progress(value):
+        progress_var.set(value)
+        loading_dialog.update_idletasks()
 
     # prog.SetIcons(ib)
     segHelper.config = config
-    segHelper.load_data(updatefunction=progress_var.set)
-    progress_bar.destroy()
+    segHelper.load_data(updatefunction=update_progress)
+    loading_dialog.destroy()
 
     segHelper.load_known_words()
     segHelper.load_extra_columns()
