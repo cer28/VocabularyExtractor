@@ -60,6 +60,7 @@ def run(segHelper):
     #                          style=wx.PD_AUTO_HIDE | wx.PD_SMOOTH)
 
     app = Tk()
+    app.title("Vocabulary Extractor")
 
     progress_var = tk.IntVar()
     progress_bar = ttk.Progressbar(app, variable=progress_var, maximum=100)
