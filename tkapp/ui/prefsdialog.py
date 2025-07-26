@@ -34,9 +34,8 @@ class PrefsDialog(tkinter.Toplevel):
         main_frame.pack()
 
         # dictionary ListBox
-        dict_panel = tkinter.LabelFrame(main_frame)
+        dict_panel = tkinter.LabelFrame(main_frame, text="Dictionaries")
         dict_panel.pack()
-        dict_panel.title = "Dictionaries"
 
         # self.m_staticText3 = tkinter.Label(self.dict_panel, text="Dictionaries")
 
@@ -53,9 +52,8 @@ class PrefsDialog(tkinter.Toplevel):
                 dict_listbox.selection_set(idx)
 
         # Filtered Words file ListBox
-        filter_panel = tkinter.LabelFrame(main_frame)
+        filter_panel = tkinter.LabelFrame(main_frame, text="Filtered word lists")
         filter_panel.pack()
-        filter_panel.title = "Filtered word lists"
 
         # self.m_staticText3 = tkinter.Label(self.filter_panel, text="Dictionaries")
 
@@ -71,9 +69,8 @@ class PrefsDialog(tkinter.Toplevel):
                 filters_listbox.selection_set(idx)
 
         # Extra Column ListBox
-        extra_col_panel = Frame(main_frame)
+        extra_col_panel = tkinter.LabelFrame(main_frame, text="Extra Column(s)")
         extra_col_panel.pack()
-        extra_col_label = Label(extra_col_panel, text="Extra Column(s)")
 
         extracol_listbox = Listbox(extra_col_panel, height=4, selectmode='multiple')
         extracol_listbox.pack()
@@ -88,11 +85,8 @@ class PrefsDialog(tkinter.Toplevel):
                 extracol_listbox.selection_set(idx)
 
         # Character set RadioBox
-        charset_panel = Frame(main_frame)
+        charset_panel = tkinter.LabelFrame(main_frame, text="Character set identifying words")
         charset_panel.pack()
-
-        charset_label = Label(charset_panel, text="Character set identifying words")
-        charset_label.pack()
 
         self.selected_charset_svar = tkinter.StringVar()
         self.selected_charset_svar.set(current_charset)

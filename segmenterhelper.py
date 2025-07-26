@@ -166,11 +166,12 @@ class SegmenterHelper:
                 "Running total words",
                 "text",
                 "num. occur.",
-                "1st occur."
+                "1st occur.",
+                "reading"
             ] +
             [self.statFiles[filename] for filename in self.config.extracolumns] +
             [
-                "english",
+                "meaning",
                 "sample sentence"
             ]) + "\n"
 
