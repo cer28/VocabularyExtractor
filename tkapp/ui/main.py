@@ -167,7 +167,7 @@ class MainWindow(ttk.Frame):
     def OnAbout(self):
         messagebox.showinfo(
             "About Application",
-            f"Vietnamese Word Extractor\n"
+            f"Vocabulary Extractor\n"
             f"Version: {version.APP_VERSION}\n"
             "Author: Chad Redman\n"
             f"Copyright: {version.COPYRIGHT_DATE}\n\n"
@@ -181,7 +181,7 @@ class MainWindow(ttk.Frame):
 
     def OnDocumentation(self):
         import webbrowser
-        webbrowser.open("http://www.zhtoolkit.com/apps/Chinese Word Extractor/help.html")
+        webbrowser.open("http://www.zhtoolkit.com/apps/Vocabulary Extractor/help.html")
 
     def OnOpen(self):
         """ Open a file """
@@ -216,7 +216,8 @@ class MainWindow(ttk.Frame):
 
         if self.config.dirtyDicts:
             progress_var = tk.IntVar()
-            progress_bar = ttk.Progressbar(self, name="Loading Dictionary", variable=progress_var, maximum=100)
+            # name="Loading Dictionary", ...
+            progress_bar = ttk.Progressbar(self, variable=progress_var, maximum=100)
             progress_bar.pack(pady=10)
 
             self.segHelper.load_data(updatefunction=progress_var.set)

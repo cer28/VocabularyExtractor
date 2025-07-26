@@ -5,6 +5,7 @@ License: GNU GPL, version 3 or later; http://www.gnu.org/copyleft/gpl.html
 
 import re
 import os
+from itertools import filterfalse
 
 from segmenter import charset
 from segmenter.plugins import SegmentMethodPlugin
@@ -276,10 +277,13 @@ class SegmenterResults:
             return "<Lexical> %s (%d tokens)" % (self.text, len(self.indexes))
 
     class Sentence:
-        def __init__(self, text, idx):
-            self.text = text
+        def __init__(self, text, idx, is_whitespace=False):
+            self.text = text.strip()
             self.start_idx = idx
             self.end_idx = idx + len(text) - 1
+            self.is_whitespace = is_whitespace
+
+
 
         def contains(self, idx):
             return (idx >= self.start_idx and idx <= self.end_idx)
@@ -368,7 +372,7 @@ class Segmenter:
     dataTypes = ('words', 'chinese_names', 'foreign_names', 'chinese_place_names', 'chengyu')
 
     sectionBreakChar = u'\u00A7' #(Section Sign)
-    sectionBreakPattern = "%s\\s*(\\[([^\\]]*)\\])?" % sectionBreakChar
+    sectionBreakPattern = f"{sectionBreakChar}\\s*(\\[([^\\]]*)\\])?"
 
 
     class Word:
@@ -534,7 +538,7 @@ class Segmenter:
 
         # For now, we will assume no hard wrapping; i.e., linefeeds can mark the end of a sentence
         #notTokens = u"(([.!?????]+)|[ \t]{2,}|\s+)"
-        notTokens = u"(([\.!\?\"\r\n]+)|[\s]{2,})"
+        notTokens = "(([\.!\?\"\r\n]+)|[\s]{2,}|\u00A7\s*\[[^\]]*\])"
         "Note: the stop delimiters are group 2; add these to the original sentence if found"
 
         results: list[SegmenterResults.Sentence] = list()
@@ -553,8 +557,11 @@ class Segmenter:
                         "ending punctuation"
                         tmptext += m.group(2)
                     results.append(SegmenterResults.Sentence(tmptext, idx))
+                # todo does this repeat the last sentence?
                 if len(tmptext) != m.end(1):
-                    results.append(SegmenterResults.Sentence(text[idx+len(tmptext):idx+m.end(1)], idx+len(tmptext)))
+                    sentence_str = text[idx+len(tmptext):idx+m.end(1)]
+                    is_label = sentence_str.startswith("\u00A7")
+                    results.append(SegmenterResults.Sentence(sentence_str, idx+len(tmptext), is_label))
                 idx += m.end(1)
             else:
                 "There is no stopchar, so the remaining text is the final sentence"
@@ -578,7 +585,7 @@ class Segmenter:
     def segmentMethodBuiltin(self, text, updatefunction=None):
         if self.tokenMatchType == 'cjk':
             # https://stackoverflow.com/a/46265018
-            tokenPattern = charset.charsets["Vietnamese"]
+            tokenPattern = charsets[self.charset][0]
         else:
             #TODO add a self.messages and display it in the log tab
             #print "Unknown token match type %s" % self.tokenMatchType
@@ -598,9 +605,12 @@ class Segmenter:
             if updatefunction:
                 updatefunction(progress * 100 / prog100)
 
+            if sentence.is_whitespace:
+                continue
+
             phrases = re.split(f"[^{tokenPattern}]+", sentence.text)
 
-            for phrase in phrases:
+            for phrase in filterfalse(lambda p: p.isspace(), phrases):
 
                 words = re.split("\s+", phrase.strip())
 
@@ -613,16 +623,19 @@ class Segmenter:
 
                 # print(words)
 
-                idx = 0
+                lex_idx = 0
+                char_idx = 0
                 length = len(words)
-                while idx < length:
-                    j = (length - idx) if (idx + 6 > length) else 6
+                while lex_idx < length:
+                    j = (length - lex_idx) if (lex_idx + 6 > length) else 6
                     while j > 1:
-                        tmpword = ' '.join(words[idx:idx + j])
+                        tmpword = ' '.join(words[lex_idx:lex_idx + j])
                         if self.getWord(tmpword):
-                            results.addLexical(tmpword, idx, self.getWord(tmpword), isCJK=True)
+                            results.addLexical(tmpword, sentence.start_idx + char_idx, self.getWord(tmpword), isCJK=True)
                             ###results.addWord(tmpword, self.getWord(tmpword))
-                            idx += j
+                            lex_idx += j
+                            char_idx += len(tmpword)
+
                             # continue
                             j = -666  # No *&^*@# labeled loops in Python
                             continue
@@ -630,11 +643,11 @@ class Segmenter:
 
                     if j == 1:
                         'TODO can this be folded with the loop above?'
-                        tmpword = words[idx]
-                        results.addLexical(tmpword, idx, self.getWord(tmpword), isCJK=True)
+                        tmpword = words[lex_idx]
+                        results.addLexical(tmpword, sentence.start_idx + char_idx, self.getWord(tmpword), isCJK=True)
                         '''this is an unknown word; i.e., a token with no associated dictionary word'''
-                        idx += 1
-
+                        lex_idx += 1
+                        char_idx += len(tmpword)
         return results
 
 

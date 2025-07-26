@@ -1,10 +1,10 @@
 <!-- python "c:\Program Files\Python27\Scripts\markdown.py" index-markdown.txt -f index.html -x tables -x superscript -x footnotes -x subscript -->
 
-## Chinese Word Extractor ##
+## Vocabulary Extractor ##
 
 ### Introduction ###
 
-_Chinese Word Extractor_ is a program to split any Chinese text into individual words, summarizing information about each unique word. The information is presented in the form of a tab-delimited matrix, so that the results can be easily copied and pasted into a spreadsheet program like Excel.
+_Vocabulary Extractor_ is a program to split any text into individual words, summarizing information about each unique word. The information is presented in the form of a tab-delimited matrix, so that the results can be easily copied and pasted into a spreadsheet program like Excel.
 
 <p><a href="screen-main.png"><img src="screen-main-tn.png" alt="screenshot-output after analysis" title="" class="aligncenter size-medium wp-image-242" height="266" width="400"></a></p>
 
@@ -18,7 +18,7 @@ If you need to filter out words from the output (for example, to eliminate words
 
 #### Windows ####
 
-Current version: [Chinese_Word_Extractor_0_3_0-win32.zip](http://www.zhtoolkit.com/apps/Chinese Word Extractor/Chinese_Word_Extractor_0_3_0-win32.zip) (2012-10-03)
+Current version: [Vocabulary_Extractor_0_3_0-win32.zip](http://www.zhtoolkit.com/apps/Vocabulary Extractor/Vocabulary_Extractor_0_3_0-win32.zip) (2012-10-03)
 
 #### Linux ####
 
@@ -30,5 +30,5 @@ See the [Help document](help.html) for more details
 
 ### Source Code ###
 
-The source code for _Chinese Word Extractor_ is also available via Subversion, at [http://svn.zhtoolkit.com/ChineseWordExtractor](http://svn.zhtoolkit.com/ChineseWordExtractor)
+The source code for _Vocabulary Extractor_ is also available via Subversion, at [http://svn.zhtoolkit.com/VocabularyExtractor](http://svn.zhtoolkit.com/VocabularyExtractor)
 

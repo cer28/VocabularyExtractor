@@ -25,12 +25,12 @@ python exe-setup.py py2exe
 
 
 chdir dist
-del "Chinese Word Extractor.exe"
-ren main.exe "Chinese Word Extractor.exe"
+del "Vocabulary Extractor.exe"
+ren main.exe "Vocabulary Extractor.exe"
 
 cd ..
-ren dist "Chinese Word Extractor"
+ren dist "Vocabulary Extractor"
 
-REM Now zip the folder "Chinese Word Extractor", and rename the zip file
+REM Now zip the folder "Vocabulary Extractor", and rename the zip file
 
 pause

@@ -28,7 +28,7 @@ def run(segHelper):
     parser = argparse.ArgumentParser(description='A sample program with options')
 
     parser.add_argument("-c", "--config", help="path to config file", required=False,
-                        default=os.path.expanduser("~/.Vietnamese Word Extractor/config.db"))
+                        default=os.path.expanduser("~/.Vocabulary Extractor/config.db"))
     parser.add_argument("-i", "--inputfile", help="Path to input file", required=False)
     parser.add_argument("-o", "--outputfile",
                         help="When using an inputfile parameter, print summary output to a file (use '-' as filename to print to the console), and do not show an application window",
@@ -99,8 +99,8 @@ def run(segHelper):
                 f.close()
             except (WindowsError | OSError | IOError) as e:
                 print(f"Warning: Failed to write to output file {opts.outputfile}: {e}")
-        frame.DestroyChildren()
-        frame.Destroy()
+        # frame.DestroyChildren()
+        # frame.Destroy()
         sys.exit()
 
     frame.notebook.messagePanel.SetValue(frame.segHelper.get_messages())

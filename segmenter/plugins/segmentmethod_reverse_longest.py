@@ -68,6 +68,4 @@ class SegmentMethodReverseLongest(SegmentMethodPlugin):
         results.lexList.reverse()
         print("<SegmenterResults>\n\ttokens = %d,\n\tlexList = %d,\n\tlexicals = %d,\n\twords = %d\n\tSentences = %d" % ( len(results.tokens), len(results.lexList), len(results.lexicals), len(results.words), len(results.sentences)))
 
-        segmenter.segmentBySentence(results, text)
-        print("<SegmenterResults>\n\ttokens = %d,\n\tlexList = %d,\n\tlexicals = %d,\n\twords = %d\n\tSentences = %d" % ( len(results.tokens), len(results.lexList), len(results.lexicals), len(results.words), len(results.sentences)))
         return results
