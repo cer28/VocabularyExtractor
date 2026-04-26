@@ -52,6 +52,9 @@ class DictionaryWord:
     def __init__(self, entry, english, pinyin=None):
         self.entry = entry
         self.english = english
+        self.pinyin = pinyin
+        self.traditional = None
+        self.simplified = None
     
     def __str__(self):
         return f'{self.entry}\t{self.english}'
@@ -420,16 +423,31 @@ class Segmenter:
         def mergeDefinitions(self):
             entry = []
             english = []
-            
+            pinyin = []
+
             for d in self.definitions:
                 if d.entry not in entry:
                     entry.append(d.entry)
                 if d.english not in english:
                     english.append(d.english)
+                if d.pinyin and d.pinyin not in pinyin:
+                    pinyin.append(d.pinyin)
 
             self.definition.entry = '; '.join(e[1] if isinstance(e, tuple) else e for e in entry)
+            self.definition.traditional = '; '.join(dict.fromkeys(e[0] for e in entry if isinstance(e, tuple))) or None
+            self.definition.simplified = '; '.join(dict.fromkeys(e[1] for e in entry if isinstance(e, tuple))) or None
             self.definition.english = '; '.join(english)
-    
+            self.definition.pinyin = '; '.join(pinyin) if pinyin else None
+
+        def getTraditional(self):
+            return self.definition.traditional
+
+        def getSimplified(self):
+            return self.definition.simplified
+
+        def getReading(self):
+            return self.definition.pinyin
+
         def getDefinition(self):
             #TODO make sure we're adding for the right charSet
             return self.definition.english   # Return only the English meaning, not the full entry\tmeaning format

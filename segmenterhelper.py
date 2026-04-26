@@ -5,7 +5,7 @@ License: GNU GPL, version 3 or later; http://www.gnu.org/copyleft/gpl.html
 
 import segmenter
 import os
-from segmenter.enums import StatisticsFormat
+from segmenter.enums import Charset, StatisticsFormat
 
 
 # The data here gets refreshed when called
@@ -183,6 +183,7 @@ class SegmenterHelper:
 
         self.tokens = ' | '.join(t.text for t in results.tokens)
 
+        is_chinese = (self.config.charset == Charset.CHINESE)
         self.results += '\t'.join(
             [
                 "Word num.",
@@ -192,6 +193,7 @@ class SegmenterHelper:
                 "1st occur."
             ] +
             [self.statFiles[filename] for filename in self.config.extracolumns if filename in self.statFiles] +
+            (["simplified", "traditional"] if is_chinese else []) +
             [
                 "reading",
                 "meaning",
@@ -215,6 +217,7 @@ class SegmenterHelper:
                         str(lex.indexes[0])
                     ] +
                     ['' for y in self.config.extracolumns] +
+                    (['', ''] if is_chinese else []) +
                     [
                         'Unknown',
                         ''
@@ -237,8 +240,9 @@ class SegmenterHelper:
                             str(lex.indexes[0])
                         ] +
                         [word.getStatistic(self.statFiles[y]) for y in self.config.extracolumns if y in self.statFiles] +
+                        ([word.getSimplified() or '', word.getTraditional() or ''] if is_chinese else []) +
                         [
-                            word.key,  # reading placeholder
+                            word.getReading() or word.key,
                             word.getDefinition(),
                             results.findFirstSentence(lex)
                         ]
