@@ -36,13 +36,65 @@ class ResultPanel1(tk.Text):
     def SetValue(self, text):
         self.delete("1.0", tk.END)
         self.insert(tk.END, text)
-        # self.entry_text.set(text)
 
     def __init__(self, parent, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
-        self.entry_text = tk.StringVar()
-        entry = tk.Entry(self, textvariable=self.entry_text)
         self.pack(expand=True, fill="both")
+
+
+class ResultGridPanel(ttk.Frame):
+    _COL_WIDTHS = {
+        'Word num.': 70,
+        'Running total words': 130,
+        'text': 100,
+        'num. occur.': 90,
+        '1st occur.': 80,
+        'simplified': 80,
+        'traditional': 80,
+        'reading': 130,
+        'meaning': 220,
+        'sample sentence': 320,
+    }
+
+    def SetValue(self, text):
+        self.tree.delete(*self.tree.get_children())
+        if not text or not text.strip():
+            return
+
+        lines = text.split('\n')
+        headers = lines[0].rstrip('\n').split('\t')
+
+        self.tree['columns'] = headers
+        self.tree['show'] = 'headings'
+        for col in headers:
+            self.tree.heading(col, text=col)
+            w = self._COL_WIDTHS.get(col, 100)
+            self.tree.column(col, width=w, minwidth=40, stretch=False)
+
+        for line in lines[1:]:
+            if not line.strip():
+                continue
+            values = line.rstrip('\n').split('\t')
+            while len(values) < len(headers):
+                values.append('')
+            self.tree.insert('', tk.END, values=values[:len(headers)])
+
+    def __init__(self, parent, *args, **kwargs):
+        super().__init__(parent, *args, **kwargs)
+        self.tree = ttk.Treeview(self, show='headings')
+
+        vsb = ttk.Scrollbar(self, orient='vertical', command=self.tree.yview)
+        hsb = ttk.Scrollbar(self, orient='horizontal', command=self.tree.xview)
+        self.tree.configure(yscrollcommand=vsb.set, xscrollcommand=hsb.set)
+
+        self.tree.grid(row=0, column=0, sticky='nsew')
+        vsb.grid(row=0, column=1, sticky='ns')
+        hsb.grid(row=1, column=0, sticky='ew')
+
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_propagate(False)
+        self.pack(expand=True, fill='both')
 
 
 class SummaryPanel1(tk.Text):
@@ -106,7 +158,7 @@ class NoteBook1(ttk.Notebook):
         self.summaryPanel = SummaryPanel1(self)
         self.add(self.summaryPanel, text="Summary")
 
-        self.resultPanel = ResultPanel1(self)
+        self.resultPanel = ResultGridPanel(self)
         self.add(self.resultPanel, text="Results")
 
         self.tokenPanel = TokenPanel1(self)
