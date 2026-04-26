@@ -79,9 +79,28 @@ class ResultGridPanel(ttk.Frame):
                 values.append('')
             self.tree.insert('', tk.END, values=values[:len(headers)])
 
+    def _select_all(self, event=None):
+        self.tree.selection_set(self.tree.get_children())
+        return 'break'
+
+    def _copy_selection(self, event=None):
+        selected = set(self.tree.selection())
+        if not selected:
+            return 'break'
+        cols = self.tree['columns']
+        header = '\t'.join(self.tree.heading(col)['text'] for col in cols)
+        rows = [
+            '\t'.join(str(v) for v in self.tree.item(item)['values'])
+            for item in self.tree.get_children()
+            if item in selected
+        ]
+        self.tree.clipboard_clear()
+        self.tree.clipboard_append(header + '\n' + '\n'.join(rows))
+        return 'break'
+
     def __init__(self, parent, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
-        self.tree = ttk.Treeview(self, show='headings')
+        self.tree = ttk.Treeview(self, show='headings', selectmode='extended')
 
         vsb = ttk.Scrollbar(self, orient='vertical', command=self.tree.yview)
         hsb = ttk.Scrollbar(self, orient='horizontal', command=self.tree.xview)
@@ -90,6 +109,9 @@ class ResultGridPanel(ttk.Frame):
         self.tree.grid(row=0, column=0, sticky='nsew')
         vsb.grid(row=0, column=1, sticky='ns')
         hsb.grid(row=1, column=0, sticky='ew')
+
+        self.tree.bind('<Control-a>', self._select_all)
+        self.tree.bind('<Control-c>', self._copy_selection)
 
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
