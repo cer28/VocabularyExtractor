@@ -5,6 +5,7 @@ License: GNU GPL, version 3 or later; http://www.gnu.org/copyleft/gpl.html
 import json
 import os
 import errno
+from segmenter.enums import Charset
 
 class Config(dict):
 
@@ -13,7 +14,7 @@ class Config(dict):
         self.extracolumns = list()
         self.currentdir = "samples"
         self.dictionaries = ['vnedict.txt.u8']
-        self.charset = 'Vietnamese'
+        self.charset = Charset.VIETNAMESE
 
         # TODO platform-independent
         #self.configFileFullPath = os.path.join(self.configPath, self.configFileName)
@@ -41,7 +42,7 @@ class Config(dict):
             'extracolumns': [],
             'currentdir': "samples",
             'dictionaries': ['vnedict.txt.u8'],
-            'charset': 'English',
+            'charset': Charset.ENGLISH,
             'dirtyDicts': False,
             'dirtyFilters': False,
             'dirtyExtraCols': False,

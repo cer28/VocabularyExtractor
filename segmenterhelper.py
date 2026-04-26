@@ -5,6 +5,7 @@ License: GNU GPL, version 3 or later; http://www.gnu.org/copyleft/gpl.html
 
 import segmenter
 import os
+from segmenter.enums import DictionaryFormat, StatisticsFormat
 
 
 # The data here gets refreshed when called
@@ -57,7 +58,7 @@ class SegmenterHelper:
         for dictname in config.dictionaries:
             self.add_message("Loading dictionary %s ..." % dictname)
             dictFile = os.path.join(config.appDir, 'dict', dictname)
-            dict = segmenter.Dictionary(dictFile, format='edict', verbose=True, updatefunction=updatefunction)
+            dict = segmenter.Dictionary(dictFile, format=DictionaryFormat.EDICT, verbose=True, updatefunction=updatefunction)
 
             if dict.messages != None:
                 for elem in dict.messages:
@@ -112,7 +113,7 @@ class SegmenterHelper:
         print(f"DEBUG: charset={charset}, filename={filename}")
         try:
             # self.stats.append(segmenter.Statistics(fullpath, 'tab', keyword, charset))
-            stat = segmenter.Statistics(fullpath, 'tab', charset)
+            stat = segmenter.Statistics(fullpath, StatisticsFormat.TAB, charset)
             self.stats[filename] = stat
             self.statFiles[filename] = stat.statisticType
             print(f"DEBUG: Successfully loaded {filename} into statFiles")

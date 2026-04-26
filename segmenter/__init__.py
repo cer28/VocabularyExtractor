@@ -10,6 +10,10 @@ from itertools import filterfalse
 from segmenter import charset
 from segmenter.plugins import SegmentMethodPlugin
 from segmenter.charset import charsets
+from segmenter.enums import (
+    DictionaryFormat, CharacterType, StatisticsFormat,
+    SegmentationMethod, TokenMatchType, DictionaryOperationType, DataType,
+)
 
 print(SegmentMethodPlugin.__subclasses__())
 
@@ -58,9 +62,6 @@ class Dictionary:
     '''
     Parses a file containing lexical entries
     '''
-
-    formatTypes = ('cedict', 'edict', 'sqlite3', 'tab')
-    characterTypes = ('simplified', 'traditional')
 
     def getWordCount(self):
         return len(self.words)
@@ -169,11 +170,11 @@ class Dictionary:
         self.words = []
         self.messages = []
         self.filename = filename
-        if format not in self.formatTypes:    # why does this say formatTypes is not defined
+        try:
+            self.format = DictionaryFormat(format)
+        except ValueError:
             self.messages.append("Unknown dictionary format %s" % format)
             raise Exception("Unknown dictionary format %s" % format)
-        else:
-            self.format = format
 
         self.dataType = dataType
 
@@ -185,9 +186,9 @@ class Dictionary:
         self.tag = tag
         self.verbose = verbose
 
-        if (format == 'edict'):
+        if self.format == DictionaryFormat.EDICT:
             self.read_edict_file(filename, updatefunction)
-        else :
+        else:
             self.messages.append("Unknown dictionary format '%s'" % format)
             raise Exception("Unknown dictionary format '%s'" % format)
 
@@ -200,9 +201,7 @@ class Statistics:
     '''
     For the storage of a list of words and an associated value
     '''
-    characterSets = ('simplified', 'traditional', 'combined', 'Vietnamese')
 #    statisticsTypes = ('hsk_level', 'frequency_per_million', 'is_chengyu')
-    formatTypes = ('tab')
 
     class Statistic:
         def __init__(self, word, value):
@@ -216,13 +215,15 @@ class Statistics:
         '''
         self.statisticType = filename
 
-        if not character in self.characterSets:
+        try:
+            self.character = CharacterType(character)
+        except ValueError:
             raise Exception("Unknown character type %s" % character)
-        self.character = character
 
-        if not formatType in self.formatTypes:
+        try:
+            self.formatType = StatisticsFormat(formatType)
+        except ValueError:
             raise Exception("Unknown formatType %s" % formatType)
-        self.formatType = formatType
         
         self.filename = filename
 
@@ -232,7 +233,7 @@ class Statistics:
             curline = 0
             for line in fh.read().splitlines():
                 curline += 1
-                if formatType == 'tab':
+                if self.formatType == StatisticsFormat.TAB:
                     m = re.match('^# Heading: ', line)
                     if m:
                         self.statisticType = line[m.end():]
@@ -364,13 +365,6 @@ class Segmenter:
     and return the result set to the caller
     '''
 
-    #TODO refactor segmentationMethods into plugin arch
-    segmentationMethods = ('simpleLongestMatch', 'longestMatchPlusTransliterations', 'longestMatchPlusTranslitPlusChNames')
-    tokenMatchTypes = ('cjk', 'cjk_plus_az')
-    #at some point maybe this can converted to an open text tag, or a mutable list
-    dictionaryOperationTypes = ('replace', 'append', 'addifempty')
-    dataTypes = ('words', 'chinese_names', 'foreign_names', 'chinese_place_names', 'chengyu')
-
     sectionBreakChar = u'\u00A7' #(Section Sign)
     sectionBreakPattern = f"{sectionBreakChar}\\s*(\\[([^\\]]*)\\])?"
 
@@ -438,7 +432,7 @@ class Segmenter:
         def isSectionBreak(self):
             return True
 
-    def __init__(self, charset, dictArray, statDict, method='simpleLongestMatch', tokenMatchType='cjk', dictionaryOperationType='replace', verbose=False):
+    def __init__(self, charset, dictArray, statDict, method=SegmentationMethod.SIMPLE_LONGEST_MATCH, tokenMatchType=TokenMatchType.CJK, dictionaryOperationType=DictionaryOperationType.REPLACE, verbose=False):
         '''
         Constructor
         Note that the Segmenter knows whether to allow just CJK or CJK + A-Z,
@@ -446,27 +440,26 @@ class Segmenter:
         '''
         if charset not in charsets.keys():
             raise Exception("Unknown character type '%s'" % charset)
-        else:
-            self.charset = charset
+        self.charset = charset
 
-        if method not in self.segmentationMethods:    # why does this say formatTypes is not defined
+        try:
+            self.segmentationMethod = SegmentationMethod(method)
+        except ValueError:
             raise Exception("Unknown segmentation method %s" % method)
-        else:
-            self.segmentationMethod = method
 
-        if not tokenMatchType in self.tokenMatchTypes:    # why does this say formatTypes is not defined
+        try:
+            self.tokenMatchType = TokenMatchType(tokenMatchType)
+        except ValueError:
             raise Exception("Unknown token match type %s" % tokenMatchType)
-        else:
-            self.tokenMatchType = tokenMatchType
 
         self.dictionaries = dictArray
         self.statistics = statDict
         self.verbose = verbose
 
-        if not dictionaryOperationType in self.dictionaryOperationTypes:    # why does this say formatTypes is not defined
+        try:
+            self.dictionaryOperationType = DictionaryOperationType(dictionaryOperationType)
+        except ValueError:
             raise Exception("Unknown dictionaryOperationType %s" % dictionaryOperationType)
-        else:
-            self.dictionaryOperationType = dictionaryOperationType
 
         self.loadPlugins("segmenter/plugins")
 
@@ -583,7 +576,7 @@ class Segmenter:
             return seg.segment(self, text, updatefunction)
 
     def segmentMethodBuiltin(self, text, updatefunction=None):
-        if self.tokenMatchType == 'cjk':
+        if self.tokenMatchType == TokenMatchType.CJK:
             # https://stackoverflow.com/a/46265018
             tokenPattern = charsets[self.charset][0]
         else:

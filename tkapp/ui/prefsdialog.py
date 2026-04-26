@@ -10,6 +10,7 @@ import tkinter.dialog
 from tkinter import StringVar, Listbox, PanedWindow, Frame, Label, Radiobutton
 
 import segmenter
+from segmenter.enums import Charset
 
 
 class PrefsDialog(tkinter.Toplevel):
@@ -27,7 +28,7 @@ class PrefsDialog(tkinter.Toplevel):
         current_charset = config.charset
         if current_charset not in charsets:
             assert ("English" in charsets)
-            current_charset = "English"
+            current_charset = Charset.ENGLISH
 
 
         main_frame = Frame(self, padx=20, pady=20, height=500, width=500)
