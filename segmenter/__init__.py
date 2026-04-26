@@ -11,6 +11,7 @@ from segmenter import charset
 from segmenter.plugins import SegmentMethodPlugin
 from segmenter.charset import charsets
 from segmenter.enums import (
+    Charset,
     DictionaryFormat, CharacterType, StatisticsFormat,
     SegmentationMethod, TokenMatchType, DictionaryOperationType, DataType,
 )
@@ -81,7 +82,7 @@ class Dictionary:
 
         m = re.match(pat, line)
         if m:
-            return DictionaryWord((m.group(1), m.group(2)), m.group(3), m.group(4))
+            return DictionaryWord((m.group(1), m.group(2)), m.group(4), m.group(3))
         else:
             if self.verbose:
                 self.messages.append(f"Warning: Invalid CEDICT entry in line {lineno} of {self.filename}: '{line}'")
@@ -96,7 +97,7 @@ class Dictionary:
         progresspct = 0
         try:
             filebytes = os.path.getsize(filename)
-            fh = open(filename)  # throws IOError
+            fh = open(filename, encoding='utf-8')  # throws IOError
         except (WindowsError, OSError, IOError) as e:
             self.messages.append("Warning: Failed to load dictionary %s: %s" % (filename, e.message))
             return
@@ -197,6 +198,8 @@ class Dictionary:
 
         if self.format == DictionaryFormat.EDICT:
             self.read_edict_file(filename, updatefunction)
+        elif self.format == DictionaryFormat.CEDICT:
+            self.read_cedict_file(filename, updatefunction)
         else:
             self.messages.append("Dictionary format '%s' is not yet implemented" % self.format)
             raise Exception("Dictionary format '%s' is not yet implemented" % self.format)
@@ -424,7 +427,7 @@ class Segmenter:
                 if d.english not in english:
                     english.append(d.english)
 
-            self.definition.entry = '; '.join(entry)
+            self.definition.entry = '; '.join(e[1] if isinstance(e, tuple) else e for e in entry)
             self.definition.english = '; '.join(english)
     
         def getDefinition(self):
@@ -484,7 +487,14 @@ class Segmenter:
         for dict in self.dictionaries:
             'note: words in the same dictionary get merged, while words in different dictionaries are handled depending on dictionaryOperationType'
             for dictword in dict.words:
-                self._addWord(dictword.entry, dict.description, dictword)
+                entry = dictword.entry
+                if isinstance(entry, tuple):
+                    trad, simp = entry
+                    self._addWord(simp, dict.description, dictword)
+                    if trad != simp:
+                        self._addWord(trad, dict.description, dictword)
+                else:
+                    self._addWord(entry, dict.description, dictword)
         for word in self.words:
             self.getWord(word).mergeDefinitions()
         
@@ -601,6 +611,8 @@ class Segmenter:
         progress = 0
         prog100 = len(results.sentences)
 
+        is_chinese = (self.charset == Charset.CHINESE)
+
         for sentence in results.sentences:
 
             progress += 1
@@ -614,16 +626,17 @@ class Segmenter:
 
             for phrase in filterfalse(lambda p: p.isspace(), phrases):
 
-                words = re.split("\s+", phrase.strip())
+                if is_chinese:
+                    words = list(phrase)
+                else:
+                    words = re.split(r"\s+", phrase.strip())
 
-                # weak attempt to detect names; lowercase the first word unless the second word is also capitalized
-                if len(words) == 1:
-                    words[0].lower()
-                elif not words[1].istitle():
-                    words[0] = words[0].lower()
-                    words[1] = words[1].lower()
-
-                # print(words)
+                    # weak attempt to detect names; lowercase the first word unless the second word is also capitalized
+                    if len(words) == 1:
+                        words[0].lower()
+                    elif not words[1].istitle():
+                        words[0] = words[0].lower()
+                        words[1] = words[1].lower()
 
                 lex_idx = 0
                 char_idx = 0
@@ -631,23 +644,19 @@ class Segmenter:
                 while lex_idx < length:
                     j = (length - lex_idx) if (lex_idx + 6 > length) else 6
                     while j > 1:
-                        tmpword = ' '.join(words[lex_idx:lex_idx + j])
+                        tmpword = ''.join(words[lex_idx:lex_idx + j]) if is_chinese else ' '.join(words[lex_idx:lex_idx + j])
                         if self.getWord(tmpword):
                             results.addLexical(tmpword, sentence.start_idx + char_idx, self.getWord(tmpword), isCJK=True)
-                            ###results.addWord(tmpword, self.getWord(tmpword))
                             lex_idx += j
                             char_idx += len(tmpword)
 
-                            # continue
                             j = -666  # No *&^*@# labeled loops in Python
                             continue
                         j -= 1
 
                     if j == 1:
-                        'TODO can this be folded with the loop above?'
-                        tmpword = words[lex_idx]
+                        tmpword = ''.join(words[lex_idx:lex_idx + 1]) if is_chinese else words[lex_idx]
                         results.addLexical(tmpword, sentence.start_idx + char_idx, self.getWord(tmpword), isCJK=True)
-                        '''this is an unknown word; i.e., a token with no associated dictionary word'''
                         lex_idx += 1
                         char_idx += len(tmpword)
         return results

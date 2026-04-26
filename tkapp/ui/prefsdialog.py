@@ -27,8 +27,7 @@ class PrefsDialog(tkinter.Toplevel):
         charsets = segmenter.charset.charsets.keys()
         current_charset = config.charset
         if current_charset not in charsets:
-            assert ("English" in charsets)
-            current_charset = Charset.ENGLISH
+            current_charset = Charset.ASCII_8
 
 
         main_frame = Frame(self, padx=20, pady=20, height=500, width=500)

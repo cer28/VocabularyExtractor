@@ -42,7 +42,7 @@ class Config(dict):
             'extracolumns': [],
             'currentdir': "samples",
             'dictionaries': ['vnedict.txt.u8'],
-            'charset': Charset.ENGLISH,
+            'charset': Charset.VIETNAMESE,
             'dirtyDicts': False,
             'dirtyFilters': False,
             'dirtyExtraCols': False,

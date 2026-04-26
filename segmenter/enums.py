@@ -32,7 +32,8 @@ class StatisticsFormat(str, Enum):
 
 class Charset(str, Enum):
     VIETNAMESE = 'Vietnamese'
-    ENGLISH = 'English'
+    CHINESE = 'Chinese'
+    ASCII_8 = 'ASCII-8'
 
     def __str__(self): return self.value
 
