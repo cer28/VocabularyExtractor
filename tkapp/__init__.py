@@ -80,7 +80,10 @@ def run(segHelper):
 
     # prog.SetIcons(ib)
     segHelper.config = config
-    segHelper.load_data(updatefunction=update_progress)
+    segHelper.load_data(
+        updatefunction=update_progress,
+        error_callback=lambda msg: tk.messagebox.showerror("Dictionary Error", msg),
+    )
     loading_dialog.destroy()
 
     segHelper.load_known_words()

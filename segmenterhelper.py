@@ -5,7 +5,7 @@ License: GNU GPL, version 3 or later; http://www.gnu.org/copyleft/gpl.html
 
 import segmenter
 import os
-from segmenter.enums import DictionaryFormat, StatisticsFormat
+from segmenter.enums import StatisticsFormat
 
 
 # The data here gets refreshed when called
@@ -42,7 +42,7 @@ class SegmenterHelper:
         self.stats = {}  # a mapping between filenames and data list
         self.statFiles = {}  # a mapping between filenames and heading
 
-    def load_data(self, updatefunction=None):
+    def load_data(self, updatefunction=None, error_callback=None):
         """
         Called when first starting the program, or when preference change sets dirtyDicts
         """
@@ -58,7 +58,22 @@ class SegmenterHelper:
         for dictname in config.dictionaries:
             self.add_message("Loading dictionary %s ..." % dictname)
             dictFile = os.path.join(config.appDir, 'dict', dictname)
-            dict = segmenter.Dictionary(dictFile, format=DictionaryFormat.EDICT, verbose=True, updatefunction=updatefunction)
+            try:
+                fmt = segmenter.Dictionary._detect_format(dictFile)
+            except Exception as e:
+                msg = f"**Error: {e}"
+                self.add_message(msg)
+                if error_callback:
+                    error_callback(msg)
+                continue
+            try:
+                dict = segmenter.Dictionary(dictFile, format=fmt, verbose=True, updatefunction=updatefunction)
+            except Exception as e:
+                msg = f"**Error: {e}"
+                self.add_message(msg)
+                if error_callback:
+                    error_callback(msg)
+                continue
 
             if dict.messages != None:
                 for elem in dict.messages:

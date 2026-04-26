@@ -166,7 +166,16 @@ class Dictionary:
         finally:
             fh.close()
 
-    def __init__(self, filename, format, character=None, dataType = 'words', description=None, tag=None, verbose=False, updatefunction=None):
+    @classmethod
+    def _detect_format(cls, filename):
+        '''Read the first line of the file; if it is %<format>, return that DictionaryFormat.'''
+        with open(filename, encoding='utf-8') as fh:
+            first = fh.readline().rstrip('\n')
+        if first.startswith('#%format: '):
+            return DictionaryFormat(first[len('#%format: '):])
+        raise Exception("Cannot detect dictionary format for %s: first line is not '#%%format: <format>'" % filename)
+
+    def __init__(self, filename, format, character=None, dataType='words', description=None, tag=None, verbose=False, updatefunction=None):
         self.words = []
         self.messages = []
         self.filename = filename
@@ -189,8 +198,8 @@ class Dictionary:
         if self.format == DictionaryFormat.EDICT:
             self.read_edict_file(filename, updatefunction)
         else:
-            self.messages.append("Unknown dictionary format '%s'" % format)
-            raise Exception("Unknown dictionary format '%s'" % format)
+            self.messages.append("Dictionary format '%s' is not yet implemented" % self.format)
+            raise Exception("Dictionary format '%s' is not yet implemented" % self.format)
 
     def __str__(self):
         return 'Dictionary %s (%s), %d Entries' % (self.description, self.filename, len(self.words))

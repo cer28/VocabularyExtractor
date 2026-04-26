@@ -243,7 +243,10 @@ class MainWindow(ttk.Frame):
                 progress_var.set(value)
                 progress_dialog.update_idletasks()
 
-            self.segHelper.load_data(updatefunction=update_progress)
+            self.segHelper.load_data(
+                updatefunction=update_progress,
+                error_callback=lambda msg: messagebox.showerror("Dictionary Error", msg),
+            )
             progress_dialog.destroy()
 
             # self.segHelper.LoadData(self.config, updatefunction=wx.ProgressDialog(title="Progress", message="Loading Dictionary", style=wx.PD_AUTO_HIDE|wx.PD_SMOOTH).Update)
