@@ -1,0 +1,5 @@
+# No third-party runtime dependencies — all imports are from the standard library.
+# tkinter is stdlib but requires a system package on Linux (see setup instructions).
+
+# Optional: only needed to build the Windows .exe via exe-setup.py
+py2exe; sys_platform == "win32"
