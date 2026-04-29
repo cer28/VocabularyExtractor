@@ -58,6 +58,8 @@ class ResultGridPanel(ttk.Frame):
 
     def SetValue(self, text):
         self.tree.delete(*self.tree.get_children())
+        self._sort_col = None
+        self._sort_reverse = False
         if not text or not text.strip():
             return
 
@@ -67,7 +69,7 @@ class ResultGridPanel(ttk.Frame):
         self.tree['columns'] = headers
         self.tree['show'] = 'headings'
         for col in headers:
-            self.tree.heading(col, text=col)
+            self.tree.heading(col, text=col, command=lambda c=col: self._sort_column(c))
             w = self._COL_WIDTHS.get(col, 100)
             self.tree.column(col, width=w, minwidth=40, stretch=False)
 
@@ -79,6 +81,27 @@ class ResultGridPanel(ttk.Frame):
                 values.append('')
             self.tree.insert('', tk.END, values=values[:len(headers)])
 
+    def _sort_column(self, col):
+        if self._sort_col == col:
+            self._sort_reverse = not self._sort_reverse
+        else:
+            self._sort_col = col
+            self._sort_reverse = False
+
+        items = [(self.tree.set(item, col), item) for item in self.tree.get_children('')]
+        try:
+            items.sort(key=lambda x: float(x[0]) if x[0] != '' else float('-inf'), reverse=self._sort_reverse)
+        except ValueError:
+            items.sort(key=lambda x: x[0].lower(), reverse=self._sort_reverse)
+
+        for index, (_, item) in enumerate(items):
+            self.tree.move(item, '', index)
+
+        for c in self.tree['columns']:
+            self.tree.heading(c, text=c)
+        arrow = ' ▼' if self._sort_reverse else ' ▲'
+        self.tree.heading(col, text=col + arrow)
+
     def _select_all(self, event=None):
         self.tree.selection_set(self.tree.get_children())
         return 'break'
@@ -88,7 +111,7 @@ class ResultGridPanel(ttk.Frame):
         if not selected:
             return 'break'
         cols = self.tree['columns']
-        header = '\t'.join(self.tree.heading(col)['text'] for col in cols)
+        header = '\t'.join(cols)
         rows = [
             '\t'.join(str(v) for v in self.tree.item(item)['values'])
             for item in self.tree.get_children()
@@ -100,6 +123,8 @@ class ResultGridPanel(ttk.Frame):
 
     def __init__(self, parent, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
+        self._sort_col = None
+        self._sort_reverse = False
         self.tree = ttk.Treeview(self, show='headings', selectmode='extended')
 
         vsb = ttk.Scrollbar(self, orient='vertical', command=self.tree.yview)
