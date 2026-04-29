@@ -210,6 +210,7 @@ class SegmenterHelper:
                 continue
             word = results.words[lex.text]
             if word is None:
+                context = '' if is_chinese else self._get_unknown_context(lex.text, lex.indexes[0])
                 self.results += '\t'.join(
                     [
                         '',
@@ -222,7 +223,8 @@ class SegmenterHelper:
                     (['', ''] if is_chinese else []) +
                     [
                         'Unknown',
-                        ''
+                        '',
+                        context
                     ]
                 ) + "\n"
             elif word.isSectionBreak():
@@ -255,6 +257,24 @@ class SegmenterHelper:
         self.summary += "Total count of filtered words: %d" % wordctNet + "\n"
         self.summary += "\nTotal count of unique words: %d" % wordUniqueGross + "\n"
         self.summary += "Total count of unique filtered words: %d" % wordUniqueNet + "\n"
+
+    def _get_unknown_context(self, word_text, position):
+        before = self.text[:position]
+        after = self.text[position + len(word_text):]
+
+        before_words = before.split()
+        if before_words:
+            before_str = ' '.join(before_words[-10:])
+        else:
+            before_str = before[-50:]
+
+        after_words = after.split()
+        if after_words:
+            after_str = ' '.join(after_words[:10])
+        else:
+            after_str = after[:50]
+
+        return f"{before_str} *{word_text}* {after_str}".strip()
 
     def get_file_items(self, directory):
         import stat
