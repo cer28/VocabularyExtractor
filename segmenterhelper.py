@@ -206,6 +206,8 @@ class SegmenterHelper:
         wordUniqueNet = 0
 
         for lex in results.lexList:
+            if not lex.text or not lex.text.strip():
+                continue
             word = results.words[lex.text]
             if word is None:
                 self.results += '\t'.join(
