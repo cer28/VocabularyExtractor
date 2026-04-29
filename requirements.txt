@@ -1,5 +1,5 @@
 # tkinter is stdlib but requires a system package on Linux (see setup instructions).
 chardet
 
-# Optional: only needed to build the Windows .exe via exe-setup.py
-py2exe; sys_platform == "win32"
+# Optional: only needed to build the Windows .exe via Build-Exe.ps1
+pyinstaller; sys_platform == "win32"

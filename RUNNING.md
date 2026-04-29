@@ -28,6 +28,25 @@ When prompted, choose **Run Once** or **Always Run** as appropriate.
 python main.py
 ```
 
+### Build Windows Executable
+
+After completing setup above:
+
+```powershell
+.\Build-Exe.ps1
+```
+
+If the script is blocked because it is accessed via a UNC path (e.g. `\\wsl.localhost\...`),
+set the execution policy for the current session first:
+
+```powershell
+Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope Process
+.\Build-Exe.ps1
+```
+
+This produces `dist\Vocabulary Extractor\` containing `Vocabulary Extractor.exe`
+and all required data files. Zip that folder to distribute.
+
 ## Linux
 
 ### Setup
