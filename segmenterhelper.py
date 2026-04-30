@@ -124,19 +124,14 @@ class SegmenterHelper:
 
     def load_statistics_file(self, config, filename, charset):
         fullpath = os.path.join(config.appDir, 'data', filename)
-        print(f"DEBUG: Attempting to load statistics file: {fullpath}")
-        print(f"DEBUG: charset={charset}, filename={filename}")
         try:
             stat = segmenter.Statistics(fullpath, StatisticsFormat.TAB)
             self.stats[filename] = stat
             self.statFiles[filename] = stat.statisticType
-            print(f"DEBUG: Successfully loaded {filename} into statFiles")
             self.add_message(f"Loaded extra column data file {filename}")
         except IOError as e:
-            print(f"DEBUG: IOError loading {filename}: {e}")
             self.add_message(f"**Failed to load data file {fullpath}: {e}")
         except Exception as e:
-            print(f"DEBUG: Other exception loading {filename}: {e}")
             self.add_message(f"**Failed to load data file {fullpath}: {e}")
 
     def read_files(self, filelist):

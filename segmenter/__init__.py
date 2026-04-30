@@ -16,7 +16,8 @@ from segmenter.enums import (
     SegmentationMethod, TokenMatchType, DictionaryOperationType, DataType,
 )
 
-print(SegmentMethodPlugin.__subclasses__())
+#TODO remove debug print
+#print(SegmentMethodPlugin.__subclasses__())
 
 try:
     WindowsError
@@ -598,7 +599,8 @@ class Segmenter:
             methods = {}
             for m in SegmentMethodPlugin.__subclasses__():
                 methods[m.key] = m
-            print(methods)
+            #TODO remove debug print
+            #print(methods)
             cls = methods[method]
             seg = cls()
             return seg.segment(self, text, updatefunction)
@@ -680,7 +682,8 @@ class Segmenter:
             return loadedPlugins
         sys.path.insert(0, pluginFolder)
         #plugins = self.enabledPlugins()
-        print(os.listdir(pluginFolder))
+        #TODO remove debug print
+        #print(os.listdir(pluginFolder))
         plugins = [i for i in os.listdir(pluginFolder) if i.endswith(".py") and i != "__init__.py"]
         plugins.sort()
         for plugin in plugins:
@@ -689,7 +692,8 @@ class Segmenter:
                 __import__(nopy)
                 #self.addMessage("Plugin %s loaded" % (plugin))
                 loadedPlugins.append(nopy)
-                print("Segmenter plugin %s loaded" % (plugin))
+                #TODO remove debug print
+                #print("Segmenter plugin %s loaded" % (plugin))
                 
             except:
                 #print "Error in %s" % plugin
