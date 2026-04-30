@@ -37,14 +37,19 @@ class PrefsDialog(tkinter.Toplevel):
         dict_panel = tkinter.LabelFrame(main_frame, text="Dictionaries")
         dict_panel.pack()
 
-        # self.m_staticText3 = tkinter.Label(self.dict_panel, text="Dictionaries")
+        dict_scroll_frame = Frame(dict_panel)
+        dict_scroll_frame.pack(padx=10, pady=10)
+        dict_listbox = Listbox(dict_scroll_frame, height=4, width=40, selectmode='multiple', name='dict_listbox', exportselection=False)
+        dict_vscroll = tkinter.Scrollbar(dict_scroll_frame, orient='vertical', command=dict_listbox.yview)
+        dict_hscroll = tkinter.Scrollbar(dict_panel, orient='horizontal', command=dict_listbox.xview)
+        dict_listbox.configure(yscrollcommand=dict_vscroll.set, xscrollcommand=dict_hscroll.set)
+        dict_listbox.grid(row=0, column=0)
+        dict_vscroll.grid(row=0, column=1, sticky='ns')
+        dict_hscroll.pack(fill='x', padx=10, pady=(0, 10))
 
-        dict_listbox = Listbox(dict_panel, height=4, selectmode='multiple', name='dict_listbox', exportselection=False)
         dict_options: list = self.get_file_items(os.path.join(self.config.appDir, 'dict'))
         for item in dict_options:
             dict_listbox.insert(dict_options.index(item), item)
-
-        dict_listbox.pack(padx=10, pady=10)
 
         # pre-select current options
         for idx, val in enumerate(dict_options):
@@ -55,10 +60,16 @@ class PrefsDialog(tkinter.Toplevel):
         filter_panel = tkinter.LabelFrame(main_frame, text="Filtered word lists")
         filter_panel.pack()
 
-        # self.m_staticText3 = tkinter.Label(self.filter_panel, text="Dictionaries")
+        filter_scroll_frame = Frame(filter_panel)
+        filter_scroll_frame.pack(padx=10, pady=10)
+        filters_listbox = Listbox(filter_scroll_frame, height=4, width=40, selectmode='multiple', name='filters_listbox', exportselection=False)
+        filter_vscroll = tkinter.Scrollbar(filter_scroll_frame, orient='vertical', command=filters_listbox.yview)
+        filter_hscroll = tkinter.Scrollbar(filter_panel, orient='horizontal', command=filters_listbox.xview)
+        filters_listbox.configure(yscrollcommand=filter_vscroll.set, xscrollcommand=filter_hscroll.set)
+        filters_listbox.grid(row=0, column=0)
+        filter_vscroll.grid(row=0, column=1, sticky='ns')
+        filter_hscroll.pack(fill='x', padx=10, pady=(0, 10))
 
-        filters_listbox = Listbox(filter_panel, height=4, selectmode='multiple', name='filters_listbox', exportselection=False)
-        filters_listbox.pack(padx=10, pady=10)
         filter_options: list = self.get_file_items(os.path.join(self.config.appDir, 'filter'))
         for item in filter_options:
             filters_listbox.insert(filter_options.index(item), item)
@@ -72,8 +83,15 @@ class PrefsDialog(tkinter.Toplevel):
         extra_col_panel = tkinter.LabelFrame(main_frame, text="Extra Column(s)")
         extra_col_panel.pack()
 
-        extracol_listbox = Listbox(extra_col_panel, height=4, selectmode='multiple', name='extracol_listbox', exportselection=False)
-        extracol_listbox.pack()
+        extracol_scroll_frame = Frame(extra_col_panel)
+        extracol_scroll_frame.pack(padx=10, pady=10)
+        extracol_listbox = Listbox(extracol_scroll_frame, height=4, width=40, selectmode='multiple', name='extracol_listbox', exportselection=False)
+        extracol_vscroll = tkinter.Scrollbar(extracol_scroll_frame, orient='vertical', command=extracol_listbox.yview)
+        extracol_hscroll = tkinter.Scrollbar(extra_col_panel, orient='horizontal', command=extracol_listbox.xview)
+        extracol_listbox.configure(yscrollcommand=extracol_vscroll.set, xscrollcommand=extracol_hscroll.set)
+        extracol_listbox.grid(row=0, column=0)
+        extracol_vscroll.grid(row=0, column=1, sticky='ns')
+        extracol_hscroll.pack(fill='x', padx=10, pady=(0, 10))
 
         extracol_options: list = self.get_file_items(os.path.join(self.config.appDir, 'data'))
         for item in extracol_options:
@@ -98,13 +116,13 @@ class PrefsDialog(tkinter.Toplevel):
             radio.pack()
 
         button_frame = Frame(main_frame)
-        button_frame.pack()
+        button_frame.pack(pady=(10, 0))
 
         ok_button = tkinter.Button(button_frame, text="OK", command=self.OnOk)
-        ok_button.pack()
+        ok_button.pack(side='left', padx=5)
 
         cancel_button = tkinter.Button(button_frame, text="Cancel", command=self.destroy)
-        cancel_button.pack()
+        cancel_button.pack(side='left', padx=5)
 
         self.dict_options = dict_options
         self.dict_listbox = dict_listbox
