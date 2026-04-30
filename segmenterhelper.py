@@ -127,8 +127,7 @@ class SegmenterHelper:
         print(f"DEBUG: Attempting to load statistics file: {fullpath}")
         print(f"DEBUG: charset={charset}, filename={filename}")
         try:
-            # self.stats.append(segmenter.Statistics(fullpath, 'tab', keyword, charset))
-            stat = segmenter.Statistics(fullpath, StatisticsFormat.TAB, charset)
+            stat = segmenter.Statistics(fullpath, StatisticsFormat.TAB)
             self.stats[filename] = stat
             self.statFiles[filename] = stat.statisticType
             print(f"DEBUG: Successfully loaded {filename} into statFiles")

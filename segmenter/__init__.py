@@ -12,7 +12,7 @@ from segmenter.plugins import SegmentMethodPlugin
 from segmenter.charset import charsets
 from segmenter.enums import (
     Charset,
-    DictionaryFormat, CharacterType, StatisticsFormat,
+    DictionaryFormat, StatisticsFormat,
     SegmentationMethod, TokenMatchType, DictionaryOperationType, DataType,
 )
 
@@ -223,17 +223,8 @@ class Statistics:
             self.word = word
             self.value = value
 
-    def __init__(self, filename, formatType, character):
-        '''note: charset 'combined' here means 3 columns: trad-expression simp-expression value
-           Charsets traditional or simplified means that the columns are expression value
-           TODO: make statistics type a list so that multiple fields can be defined 
-        '''
+    def __init__(self, filename, formatType):
         self.statisticType = filename
-
-        try:
-            self.character = CharacterType(character)
-        except ValueError:
-            raise Exception("Unknown character type %s" % character)
 
         try:
             self.formatType = StatisticsFormat(formatType)
