@@ -70,6 +70,12 @@
 <li>Sample Sentence:  The first sentence the word was found in, with the word isolated by asterisks</li>
 </ul>
 <p>To export the Result data, simply highlight all the data using Control-A, and copy it to the clipboard. The contents can be pasted directly into Excel or another spreadsheet program for further analysis.</p>
+<h3>Section breaks</h3>
+<p>The § character (section sign, Unicode U+00A7) is a special delimiter recognized by the program when it appears in source text. It marks a boundary between sections, preventing words from being counted across that boundary and causing a separator line to appear in the Results tab at that position.</p>
+<p>The syntax is:</p>
+<pre><code>§ [optional label]</code></pre>
+<p>The label, if present, appears in the separator line in the Results tab. When multiple files are loaded via File-&gt;Open, the program automatically inserts a <code>§ [filename]</code> line between each file, which is why each file shows "a heading with a special character and the file name" in the results.</p>
+<p>You can also insert § manually in the Source tab to divide a single file into named sections. For example, a file containing multiple articles from a series could use <code>§ [Article 1]</code>, <code>§ [Article 2]</code>, etc. to keep the sections visually distinct in the results.</p>
 <h3>Setting preferences</h3>
 <p><img src="screen-prefs.png" alt="screenshot-preferences" title="" class="aligncenter size-medium wp-image-242" height="419" width="709"></p>
 
