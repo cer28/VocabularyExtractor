@@ -6,8 +6,8 @@ License: GNU GPL, version 3 or later; http://www.gnu.org/copyleft/gpl.html
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
 import os
-import version
-from tkapp.ui import prefsdialog
+import about
+from tkapp.ui import prefsdialog, aboutdialog
 
 
 # non-standard menus
@@ -276,23 +276,12 @@ class MainWindow(ttk.Frame):
         self.notebook.messagePanel.SetValue(self.segHelper.get_messages())
 
     def OnAbout(self):
-        messagebox.showinfo(
-            "About Application",
-            f"Vocabulary Extractor\n"
-            f"Version: {version.APP_VERSION}\n"
-            "Author: Chad Redman\n"
-            f"Copyright: {version.COPYRIGHT_DATE}\n\n"
-            "This is a tool to extract vocabulary from Vietnamese text, summarizing "
-            "the unique words with word count, English definition, and other useful "
-            "statistics.\n\n"
-            "Website: http://www.zhtoolkit.com/apps/Vietnamese_Word_Extractor\n\n"
-            "This program is licensed under the terms of the "
-            "GPL v.3.0; see http://www.gnu.org/licenses/gpl-3.0.html for details.",
-        )
+        d = aboutdialog.AboutDialog(self.root_window, about.ABOUT_TITLE, about.ABOUT_TEXT)
+        self.root_window.wait_window(d)
 
     def OnDocumentation(self):
         import webbrowser
-        webbrowser.open("http://www.zhtoolkit.com/apps/Vocabulary Extractor/help.html")
+        webbrowser.open(about.DOCUMENTATION_URL)
 
     def OnOpen(self):
         """ Open a file """

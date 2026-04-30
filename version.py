@@ -1,2 +1,0 @@
-APP_VERSION = "0.0.1 alpha"
-COPYRIGHT_DATE = "2025"
