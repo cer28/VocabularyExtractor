@@ -21,8 +21,8 @@ import codecs
 out = codecs.getwriter('utf-8')(sys.stdout)
 
 
-#filename_words = "../data/simplified/Freq_per_Million_Leeds_internet_50k.u8";
-filename_words = "../data/simplified/Freq_per_Million.U8";
+#filename_words = "../data/simplified/Freq_per_Million_Leeds_internet_50k.txt";
+filename_words = "../data/simplified/Freq_per_Million.txt";
 
 words = {}
 clozes = {}
@@ -66,7 +66,7 @@ for char in clozes.keys():
     out.write("%s\t%s\n" % (char, u", ".join(clozes[char][0:4])))
 
 '''
-fh = open("../dict/chardict-unihan_readingsX.u8", "w")
+fh = open("../dict/chardict-unihan_readingsX.txt", "w")
 
 for cp in codepoints:
     if int(cp, 16) < 65536:

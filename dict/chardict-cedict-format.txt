@@ -23,7 +23,7 @@
 #         for line in fh.read().splitlines():
 #             print '%s\t%s' % (line, unichr(int(line, 16)))
 # 
-# Save as tempdata.u8
+# Save as tempdata.txt
 # 
 # Run scratch2.py, with cedict, with simplified and traditional segmenter
 # 

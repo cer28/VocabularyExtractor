@@ -43,7 +43,7 @@ The Character Set option sets the program to analyze the text as using simplifie
 
 Dictionaries are stored in the program subdirectory "dict". The CC-CEDICT dictionary is included with the program, and any dictionary in the CEDICT format (traditional simplified [pinyin] /English/definitions/) can be used as an additional source of definitions. All dictionary files must be in Unicode UTF-8 format.
 
-The CC-CEDICT dictionary can be updated to the latest version by downloading the latest file "cedict_1_0_ts_utf-8_mdbg.zip" from [http://www.mdbg.net/chindict/chindict.php?page=cedict](http://www.mdbg.net/chindict/chindict.php?page=cedict), extracting the file, and replacing the existing cedict_ts.u8 file.
+The CC-CEDICT dictionary can be updated to the latest version by downloading the latest file "cedict_1_0_ts_utf-8_mdbg.zip" from [http://www.mdbg.net/chindict/chindict.php?page=cedict](http://www.mdbg.net/chindict/chindict.php?page=cedict), extracting the file, and replacing the existing cedict_ts.txt file.
 
 Dictionaries or other files in the dict directory which are named with a leading underscore "_" will not be listed in the Preferences tab. This can be useful for documentation files or dictionaries temporarily on hold.
 

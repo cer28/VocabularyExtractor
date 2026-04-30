@@ -18,7 +18,7 @@ print <<EOF;
 EOF
 
 
-my $DICTFILE = 'G:/Home/Chinese/Dictionaries/cedict_ts.u8';
+my $DICTFILE = 'G:/Home/Chinese/Dictionaries/cedict_ts.txt';
 
 my %dict;  # "trad:simp:pinyin" => "english"
 my %partialdict;  # store trad and simp as headwords, to suggest correct targets for invalid references

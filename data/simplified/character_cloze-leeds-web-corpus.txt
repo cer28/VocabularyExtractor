@@ -1,6 +1,6 @@
 #
 # Heading: Character clozes from Leeds Web Corpus
-# Source: ../data/simplified/Freq_per_Million_Leeds_internet_50k.u8
+# Source: ../data/simplified/Freq_per_Million_Leeds_internet_50k.txt
 #
 # For each character, print the top 4 cloze deletions in order of decreasing frequency
 #

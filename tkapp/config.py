@@ -13,7 +13,7 @@ class Config(dict):
         self.filters = list()
         self.extracolumns = list()
         self.currentdir = "samples"
-        self.dictionaries = ['vnedict.txt.u8']
+        self.dictionaries = ['vnedict.txt.txt']
         self.charset = Charset.VIETNAMESE
 
         # TODO platform-independent
@@ -37,11 +37,11 @@ class Config(dict):
 
     def setDefaults(self):
         fields = {
-            #'dicts': {"cedict_ts.u8" : "cedict"},
+            #'dicts': {"cedict_ts.txt" : "cedict"},
             'filters': [],
             'extracolumns': [],
             'currentdir': "samples",
-            'dictionaries': ['vnedict.txt.u8'],
+            'dictionaries': ['vnedict.txt'],
             'charset': Charset.VIETNAMESE,
             'dirtyDicts': False,
             'dirtyFilters': False,

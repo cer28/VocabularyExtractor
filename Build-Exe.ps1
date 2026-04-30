@@ -24,7 +24,7 @@ pyinstaller `
     --name="Vocabulary Extractor" `
     --add-data="data/simplified;data/simplified" `
     --add-data="data/traditional;data/traditional" `
-    --add-data="data/*.u8;data" `
+    --add-data="data/*.txt;data" `
     --add-data="dict;dict" `
     --add-data="filter;filter" `
     --add-data="samples/CN;samples/CN" `

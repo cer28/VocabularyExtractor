@@ -162,7 +162,7 @@ for line in lines:
 codepoints = pinyin.keys()
 codepoints.sort()
 
-fh = open("../dict/chardict-unihan_readingsX.u8", "w")
+fh = open("../dict/chardict-unihan_readingsX.txt", "w")
 
 for cp in codepoints:
     if int(cp, 16) < 65536:
