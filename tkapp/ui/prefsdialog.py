@@ -184,29 +184,25 @@ class PrefsDialog(tkinter.Toplevel):
         import stat
 
         choices = []
-        filenames = []
 
         if not pathlib.Path(directory).is_dir():
-            """
-            Directory does not exist; maybe no subdirectory for the charset 
-            """
             print(f"Unable to read files in directory {directory} (directory not found)")
             return choices
+
         try:
-            filenames = os.listdir(directory)
+            for dirpath, dirnames, filenames in os.walk(directory):
+                dirnames[:] = sorted(d for d in dirnames if not d.startswith('_'))
+                for filename in sorted(filenames):
+                    if not filename.startswith('_'):
+                        filepath = os.path.join(dirpath, filename)
+                        try:
+                            st = os.stat(filepath)
+                        except os.error:
+                            continue
+                        if stat.S_ISREG(st.st_mode):
+                            relpath = pathlib.Path(filepath).relative_to(directory).as_posix()
+                            choices.append(relpath)
         except Exception as e:
             print(f"Error in get_file_items: {e}")
-            dlg = tkinter.messagebox(self, f"Unable to read files in directory {directory} ({e})")
-            dlg.ShowModal()
-            dlg.Destroy()
-            return choices
 
-        for filename in filenames:
-            if filename[0] != "_":
-                try:
-                    st = os.stat(os.path.join(directory, filename))
-                except os.error:
-                    continue
-                if stat.S_ISREG(st.st_mode):
-                    choices.append(filename)
         return choices
