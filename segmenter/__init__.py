@@ -81,7 +81,7 @@ class Dictionary:
 
         # Allow semicolons in pinyin, because the chardict has them that way
         # pat = u'([%s]+)[ \t]([%s]+)[ \t]\[([a-zA-Z0-9,\xb7: ]+)\][ \t]/(.*)/\s*$' % (cjkRange, cjkRange)
-        pat = u'([%s]+)[ \t]([%s]+)[ \t]\[([a-zA-Z0-9,\xb7:; ]+)\][ \t]/(.*)/\s*$' % (cjkRange, cjkRange)
+        pat = r'([%s]+)[ \t]([%s]+)[ \t]\[([a-zA-Z0-9,\xb7:; ]+)\][ \t]/(.*)/\s*$' % (cjkRange, cjkRange)
 
         m = re.match(pat, line)
         if m:
@@ -559,7 +559,7 @@ class Segmenter:
 
         # For now, we will assume no hard wrapping; i.e., linefeeds can mark the end of a sentence
         #notTokens = u"(([.!?????]+)|[ \t]{2,}|\s+)"
-        notTokens = "(([\.!\?\"]+|[\r\n]+)|[\s]{2,}|\u00A7\s*\[[^\]]*\])"
+        notTokens = r'(([\.!\?"]+|[\r\n]+)|[\s]{2,}|\u00A7\s*\[[^\]]*\])'
         "Note: the stop delimiters are group 2; add these to the original sentence if found"
 
         results: list[SegmenterResults.Sentence] = list()

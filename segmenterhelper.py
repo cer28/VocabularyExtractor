@@ -113,7 +113,7 @@ class SegmenterHelper:
         try:
             for line in fh.read().splitlines():
                 lineno += 1
-                if not re.match('\s*#', line):
+                if not re.match(r'\s*#', line):
                     m = re.match('[^ \t]+', line)
                     if m:
                         self.filterwords.append(m.group(0))
