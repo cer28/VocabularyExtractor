@@ -1,5 +1,0 @@
-2013-01-20
-
-(FIXED in 0.3.0) For CC-CEDICT with multiple entries with the same simplified but different traditional characters, only one of the definitions gets defined.
-(FIXED in 0.3.2) Sentence splitting only splits on periods and exclamation marks.
-(FIXED in 0.3.2) Filter files recognize only the tab separator when splitting to get the first column, and does not recognize the space as a delimiter
