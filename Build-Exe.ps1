@@ -22,13 +22,14 @@ pyinstaller `
     --windowed `
     --icon="application-icon.ico" `
     --name="Vocabulary Extractor" `
-    --add-data="data/simplified;data/simplified" `
-    --add-data="data/traditional;data/traditional" `
-    --add-data="data/*.txt;data" `
+    --add-data="data/CN_trad;data/CN_trad" `
+    --add-data="data/CN_simpl;data/CN_simpl" `
+    --add-data="data/VN;data/VN" `
     --add-data="dict;dict" `
     --add-data="filter;filter" `
     --add-data="samples/CN;samples/CN" `
     --add-data="samples/VN;samples/VN" `
+    --add-data="samples/EN;samples/EN" `
     --add-data="application-icon.ico;." `
     main.py
 
