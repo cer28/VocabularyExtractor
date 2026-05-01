@@ -633,7 +633,11 @@ class Segmenter:
             if sentence.is_whitespace:
                 continue
 
-            phrases = re.split(f"[^{tokenPattern}]+", sentence.text)
+            if self.charset == Charset.ASCII_8:
+                # A single hyphen between letters is part of the word; two or more hyphens are stop characters
+                phrases = re.findall(f"[{tokenPattern}]+(?:-[{tokenPattern}]+)*", sentence.text)
+            else:
+                phrases = re.split(f"[^{tokenPattern}]+", sentence.text)
 
             for phrase in filterfalse(lambda p: p.isspace(), phrases):
 
@@ -645,7 +649,7 @@ class Segmenter:
                     # weak attempt to detect names; lowercase the first word unless the second word is also capitalized
                     if len(words) == 1:
                         words[0].lower()
-                    elif not words[1].istitle():
+                    elif len(words) >= 2 and not words[1].istitle():
                         words[0] = words[0].lower()
                         words[1] = words[1].lower()
 
