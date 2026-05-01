@@ -97,26 +97,41 @@
 <h3>Note on Unicode UTF-8 encoding</h3>
 <p>Some programs, when saving files in UTF-8 format, will insert as the first character in the file an extra character known as a byte-order mark (BOM). It's difficult to tell whether this character exists in the file without hex editors or other special software. This program will read dictionaries, filters, or extra column files as if the BOM were real data. This means that data on the first line of the file may not work as expected. If you are uncertain whether this is happening and want to protect against it, you can simply have a comment (a line starting with '#') as the first line of the file.</p>
 <h3>Command Line Usage</h3>
-<p>The program can also function in console mode, useful for situations involving automation or creating launch shortcuts. Alternate configuration files can be used, for
-example, to start the program in either simplified or traditional mode, or to use different dictionaries. The --inputfile parameter can be used to load an initial
-file into the source window without needing to open it from the menus. The --outputfile parameter can be used to bypass the windowed application almost entirely (except for temporary progress messages) and send its tabular data to the specified file. Current options are as follows:</p>
-<pre><code>"Vocabulary Extractor.exe" --help
+<p>The program supports two command-line modes: <strong>interactive</strong> (default) and <strong>headless</strong>.</p>
+<p><strong>Interactive mode</strong> launches the GUI as normal. <code>--inputfile</code> pre-loads a file into the Source tab. <code>--config</code> points to an alternate configuration file, which can be used to start the program with different dictionaries or a different character set.</p>
+<p><strong>Headless mode</strong> (<code>--headless</code>) skips the GUI entirely and writes tab-delimited results to a file or stdout. This is useful for automation, scripting, or batch processing. <code>--inputfile</code> is required in headless mode; output goes to <code>--outputfile</code> or stdout if that option is omitted.</p>
+<p>Run with <code>--help</code> to see all options:</p>
+<pre><code>python main.py --help</code></pre>
 
-Usage: main.py
+<h4>Options</h4>
+<table>
+<thead><tr><th>Option</th><th>Short</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>--headless</code></td><td></td><td>Run without UI; requires <code>--inputfile</code></td></tr>
+<tr><td><code>--inputfile PATH</code></td><td><code>-i</code></td><td>Path to input text file</td></tr>
+<tr><td><code>--outputfile PATH</code></td><td><code>-o</code></td><td>Output file for tab-delimited results; use <code>-</code> for stdout (default in headless mode)</td></tr>
+<tr><td><code>--config PATH</code></td><td><code>-c</code></td><td>Path to config file (default: <code>~/.Vocabulary Extractor/config.db</code>). Loaded as baseline; other options override it.</td></tr>
+<tr><td><code>--dict PATH</code></td><td></td><td>Path to a dictionary file. Can be used multiple times.</td></tr>
+<tr><td><code>--charset VALUE</code></td><td></td><td>Character set: <code>Vietnamese</code>, <code>Chinese</code>, or <code>ASCII-8</code></td></tr>
+<tr><td><code>--filter PATH</code></td><td></td><td>Path to a filter (known-words) file. Can be used multiple times.</td></tr>
+<tr><td><code>--extracolumn PATH</code></td><td></td><td>Path to an extra column data file. Can be used multiple times.</td></tr>
+<tr><td><code>--appdir PATH</code></td><td></td><td>Base application directory containing <code>dict/</code>, <code>data/</code>, and <code>filter/</code> subdirectories</td></tr>
+</tbody>
+</table>
+<p>When <code>--config</code> is combined with <code>--dict</code>, <code>--charset</code>, <code>--filter</code>, or <code>--extracolumn</code>, the config file is loaded first as a baseline and the command-line values override the corresponding settings.</p>
+<p>Paths supplied to <code>--dict</code>, <code>--filter</code>, and <code>--extracolumn</code> may be absolute or relative to the current working directory.</p>
 
-Options:
-  -h, --help            show this help message and exit
-  -c CONFIG, --config=CONFIG
-                        path to config file
-  -i INPUTFILE, --inputfile=INPUTFILE
-                        Path to input file
-  -o OUTPUTFILE, --outputfile=OUTPUTFILE
-                        When using an inputfile parameter, print summary
-                        output to a file (use '-' as filename to print to the
-                        console), and do not show an application window
-  --appdir=APPDIR       Base directory of the application. It must contain
-                        subdirectories dict, data, and filter
-</code></pre>
+<h4>Examples</h4>
+<p>Run headless, output to stdout:</p>
+<pre><code>python main.py --headless -i samples/VN/mytext.txt</code></pre>
+<p>Run headless with explicit dictionary, charset, filter, extra column, and output file:</p>
+<pre><code>python main.py --headless -i samples/VN/mytext.txt -o results.tsv \
+    --dict dict/VN/vnedict.txt \
+    --charset Vietnamese \
+    --filter filter/VN/known-words.txt \
+    --extracolumn data/VN/Freq_per_Million.txt</code></pre>
+<p>Start the GUI with a pre-loaded file using a custom config:</p>
+<pre><code>python main.py -c myconfig.db -i samples/VN/mytext.txt</code></pre>
     </div> <!-- content -->
 
 </div>

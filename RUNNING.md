@@ -70,3 +70,29 @@ pip install -r requirements.txt
 ```bash
 python main.py
 ```
+
+## Headless / Command-Line Mode
+
+The `--headless` flag runs the program without any UI and writes tab-delimited results to a file or stdout. This is useful for scripting or batch processing.
+
+```bash
+# Output to stdout
+python main.py --headless -i samples/VN/mytext.txt
+
+# Output to a file
+python main.py --headless -i samples/VN/mytext.txt -o results.tsv
+```
+
+Additional options let you specify dictionaries, charset, filters, and extra column data directly on the command line, overriding whatever is in the config file:
+
+```bash
+python main.py --headless \
+    -i samples/VN/mytext.txt \
+    -o results.tsv \
+    --dict dict/VN/vnedict.txt \
+    --charset Vietnamese \
+    --filter filter/VN/known-words.txt \
+    --extracolumn data/VN/Freq_per_Million.txt
+```
+
+Run `python main.py --help` for the full list of options. See `doc/help.html` for detailed documentation.

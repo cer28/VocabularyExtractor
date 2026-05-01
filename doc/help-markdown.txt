@@ -84,23 +84,48 @@ Some programs, when saving files in UTF-8 format, will insert as the first chara
 
 ### Command Line Usage ###
 
-The program can also function in console mode, useful for situations involving automation or creating launch shortcuts. Alternate configuration files can be used, for
-example, to start the program in either simplified or traditional mode, or to use different dictionaries. The --inputfile parameter can be used to load an initial
-file into the source window without needing to open it from the menus. The --outputfile parameter can be used to bypass the windowed application almost entirely (except for temporary progress messages) and send its tabular data to the specified file. Current options are as follows:
+The program supports two command-line modes: **interactive** (default) and **headless**.
 
-	"Vocabulary Extractor.exe" --help
-	
-	Usage: main.py
-	
-	Options:
-	  -h, --help            show this help message and exit
-	  -c CONFIG, --config=CONFIG
-	                        path to config file
-	  -i INPUTFILE, --inputfile=INPUTFILE
-	                        Path to input file
-	  -o OUTPUTFILE, --outputfile=OUTPUTFILE
-	                        When using an inputfile parameter, print summary
-	                        output to a file (use '-' as filename to print to the
-	                        console), and do not show an application window
-	  --appdir=APPDIR       Base directory of the application. It must contain
-	                        subdirectories dict, data, and filter
+**Interactive mode** launches the GUI as normal. `--inputfile` pre-loads a file into the Source tab. `--config` points to an alternate configuration file, which can be used to start the program with different dictionaries or a different character set.
+
+**Headless mode** (`--headless`) skips the GUI entirely and writes tab-delimited results to a file or stdout. This is useful for automation, scripting, or batch processing. `--inputfile` is required in headless mode; output goes to `--outputfile` or stdout if that option is omitted.
+
+Run with `--help` to see all options:
+
+	python main.py --help
+
+#### Options ####
+
+| Option | Short | Description |
+|---|---|---|
+| `--headless` | | Run without UI; requires `--inputfile` |
+| `--inputfile PATH` | `-i` | Path to input text file |
+| `--outputfile PATH` | `-o` | Output file for tab-delimited results; use `-` for stdout (default in headless mode) |
+| `--config PATH` | `-c` | Path to config file (default: `~/.Vocabulary Extractor/config.db`). Loaded as baseline; other options override it. |
+| `--dict PATH` | | Path to a dictionary file. Can be used multiple times. |
+| `--charset VALUE` | | Character set: `Vietnamese`, `Chinese`, or `ASCII-8` |
+| `--filter PATH` | | Path to a filter (known-words) file. Can be used multiple times. |
+| `--extracolumn PATH` | | Path to an extra column data file. Can be used multiple times. |
+| `--appdir PATH` | | Base application directory containing `dict/`, `data/`, and `filter/` subdirectories |
+
+When `--config` is combined with `--dict`, `--charset`, `--filter`, or `--extracolumn`, the config file is loaded first as a baseline and the command-line values override the corresponding settings.
+
+Paths supplied to `--dict`, `--filter`, and `--extracolumn` may be absolute or relative to the current working directory.
+
+#### Examples ####
+
+Run headless, output to stdout:
+
+	python main.py --headless -i samples/VN/mytext.txt
+
+Run headless with explicit dictionary, charset, filter, extra column, and output file:
+
+	python main.py --headless -i samples/VN/mytext.txt -o results.tsv \
+	    --dict dict/VN/vnedict.txt \
+	    --charset Vietnamese \
+	    --filter filter/VN/known-words.txt \
+	    --extracolumn data/VN/Freq_per_Million.txt
+
+Start the GUI with a pre-loaded file using a custom config:
+
+	python main.py -c myconfig.db -i samples/VN/mytext.txt

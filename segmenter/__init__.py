@@ -5,6 +5,7 @@ License: GNU GPL, version 3 or later; http://www.gnu.org/copyleft/gpl.html
 
 import re
 import os
+import sys
 from itertools import filterfalse
 
 from segmenter import charset
@@ -138,7 +139,7 @@ class Dictionary:
         else:
             if self.verbose:
                 self.messages.append(f'Warning: Invalid dictionary entry in line {lineno} of {self.filename}: "{line}"')
-                print(f'Warning: Invalid dictionary entry in line {lineno} of {self.filename}: "{line}"')
+                print(f'Warning: Invalid dictionary entry in line {lineno} of {self.filename}: "{line}"', file=sys.stderr)
 
                 
             return None
