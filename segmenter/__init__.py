@@ -664,7 +664,8 @@ class Segmenter:
                             results.addLexical(tmpword, sentence.start_idx + char_idx, self.getWord(tmpword), isCJK=True)
                             lex_idx += j
                             char_idx += len(tmpword)
-
+                            while char_idx < len(phrase) and phrase[char_idx].isspace():
+                                char_idx += 1
                             j = -666  # No *&^*@# labeled loops in Python
                             continue
                         j -= 1
@@ -674,6 +675,8 @@ class Segmenter:
                         results.addLexical(tmpword, sentence.start_idx + char_idx, self.getWord(tmpword), isCJK=True)
                         lex_idx += 1
                         char_idx += len(tmpword)
+                        while char_idx < len(phrase) and phrase[char_idx].isspace():
+                            char_idx += 1
         return results
 
 
